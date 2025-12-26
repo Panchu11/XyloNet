@@ -14,6 +14,23 @@ export const metadata: Metadata = {
   title: "XyloNet - Stablecoin SuperExchange on Arc",
   description: "The premier DEX + Bridge on Arc Network. Instant settlement, predictable fees, and native cross-chain transfers powered by Circle CCTP.",
   keywords: ["DEX", "Bridge", "Arc Network", "Stablecoin", "USDC", "EURC", "DeFi"],
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: 'XyloNet - Stablecoin SuperExchange on Arc',
+    description: 'The premier DEX + Bridge on Arc Network. Swap, Bridge, and Earn with USDC, EURC, and USYC.',
+    url: 'https://xylonet.xyz',
+    siteName: 'XyloNet',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'XyloNet - Stablecoin SuperExchange on Arc',
+    description: 'The premier DEX + Bridge on Arc Network.',
+  },
 };
 
 export default function RootLayout({
