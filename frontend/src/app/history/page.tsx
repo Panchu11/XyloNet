@@ -3,21 +3,38 @@
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { formatUnits } from 'viem'
-import { ArrowRight, ArrowUpDown, Download, Upload, RefreshCw, ExternalLink, Clock } from 'lucide-react'
-import { CONTRACTS, TOKENS, ARC_NETWORK } from '@/config/constants'
+import { ArrowRight, ArrowUpDown, Download, Upload, RefreshCw, ExternalLink, Clock, Trash2 } from 'lucide-react'
+import { CONTRACTS, ARC_NETWORK } from '@/config/constants'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { SkeletonTable } from '@/components/ui/Skeleton'
-import { cn, formatNumber, formatUSD } from '@/lib/utils'
+import { cn, formatNumber } from '@/lib/utils'
 
-interface Transaction {
+export interface Transaction {
   hash: string
-  type: 'swap' | 'add_liquidity' | 'remove_liquidity' | 'deposit' | 'withdraw' | 'bridge'
+  type: 'swap' | 'add_liquidity' | 'remove_liquidity' | 'deposit' | 'withdraw' | 'bridge' | 'approve'
   timestamp: number
   tokenIn?: string
   tokenOut?: string
   amountIn?: string
   amountOut?: string
   status: 'success' | 'pending' | 'failed'
+}
+
+// Helper to save transaction to localStorage
+export function saveTransaction(tx: Transaction) {
+  try {
+    const stored = localStorage.getItem('xylonet_transactions')
+    const transactions: Transaction[] = stored ? JSON.parse(stored) : []
+    // Check if already exists
+    if (!transactions.find(t => t.hash === tx.hash)) {
+      transactions.unshift(tx) // Add to beginning
+      // Keep only last 50 transactions
+      const trimmed = transactions.slice(0, 50)
+      localStorage.setItem('xylonet_transactions', JSON.stringify(trimmed))
+    }
+  } catch (e) {
+    console.error('Failed to save transaction:', e)
+  }
 }
 
 // Token address to symbol mapping
@@ -33,6 +50,25 @@ export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'swap' | 'liquidity' | 'vault' | 'bridge'>('all')
 
+  const loadTransactions = () => {
+    // Load from localStorage first
+    try {
+      const stored = localStorage.getItem('xylonet_transactions')
+      if (stored) {
+        const localTxs: Transaction[] = JSON.parse(stored)
+        setTransactions(localTxs)
+      }
+    } catch (e) {
+      console.error('Failed to load transactions:', e)
+    }
+    setIsLoading(false)
+  }
+
+  const clearHistory = () => {
+    localStorage.removeItem('xylonet_transactions')
+    setTransactions([])
+  }
+
   useEffect(() => {
     if (!address) {
       setTransactions([])
@@ -40,9 +76,10 @@ export default function HistoryPage() {
       return
     }
 
-    // Fetch transactions from Blockscout API
-    const fetchTransactions = async () => {
-      setIsLoading(true)
+    loadTransactions()
+
+    // Also try to fetch from Blockscout API and merge
+    const fetchFromBlockscout = async () => {
       try {
         const response = await fetch(
           `https://testnet.arcscan.app/api/v2/addresses/${address}/transactions?filter=to%7Cfrom`
@@ -50,20 +87,19 @@ export default function HistoryPage() {
         
         if (response.ok) {
           const data = await response.json()
-          const txs: Transaction[] = []
+          const apiTxs: Transaction[] = []
           
           for (const tx of data.items || []) {
-            // Parse transaction based on to address
             const toAddr = tx.to?.hash?.toLowerCase()
             const method = tx.method || ''
             
             let txType: Transaction['type'] | null = null
             let tokenIn = '', tokenOut = '', amountIn = '', amountOut = ''
             
+            // Match against XyloNet contracts
             if (toAddr === CONTRACTS.ROUTER.toLowerCase()) {
               if (method.includes('swap')) {
                 txType = 'swap'
-                // Parse decoded input if available
                 if (tx.decoded_input?.parameters) {
                   const params = tx.decoded_input.parameters
                   tokenIn = TOKEN_MAP[params[0]?.value?.toLowerCase()] || 'Unknown'
@@ -84,10 +120,16 @@ export default function HistoryPage() {
               }
             } else if (toAddr === CONTRACTS.BRIDGE.toLowerCase()) {
               txType = 'bridge'
+            } else if (toAddr === CONTRACTS.USDC_EURC_POOL.toLowerCase() || toAddr === CONTRACTS.USDC_USYC_POOL.toLowerCase()) {
+              if (method.includes('addLiquidity')) {
+                txType = 'add_liquidity'
+              } else if (method.includes('removeLiquidity')) {
+                txType = 'remove_liquidity'
+              }
             }
             
             if (txType) {
-              txs.push({
+              apiTxs.push({
                 hash: tx.hash,
                 type: txType,
                 timestamp: new Date(tx.timestamp).getTime(),
@@ -100,16 +142,21 @@ export default function HistoryPage() {
             }
           }
           
-          setTransactions(txs)
+          // Merge API transactions with local ones (avoid duplicates)
+          if (apiTxs.length > 0) {
+            setTransactions(prev => {
+              const existingHashes = new Set(prev.map(t => t.hash))
+              const newTxs = apiTxs.filter(t => !existingHashes.has(t.hash))
+              return [...newTxs, ...prev].sort((a, b) => b.timestamp - a.timestamp).slice(0, 50)
+            })
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch transactions:', error)
-      } finally {
-        setIsLoading(false)
+        console.error('Failed to fetch from Blockscout:', error)
       }
     }
 
-    fetchTransactions()
+    fetchFromBlockscout()
   }, [address])
 
   const filteredTransactions = transactions.filter((tx) => {
@@ -135,6 +182,8 @@ export default function HistoryPage() {
         return <Upload className="w-4 h-4" />
       case 'bridge':
         return <ArrowRight className="w-4 h-4" />
+      case 'approve':
+        return <RefreshCw className="w-4 h-4" />
     }
   }
 
@@ -152,6 +201,8 @@ export default function HistoryPage() {
         return 'Vault Withdraw'
       case 'bridge':
         return 'Bridge'
+      case 'approve':
+        return 'Approve'
     }
   }
 
@@ -169,6 +220,8 @@ export default function HistoryPage() {
         return 'bg-amber-500/20 text-amber-400'
       case 'bridge':
         return 'bg-purple-500/20 text-purple-400'
+      case 'approve':
+        return 'bg-gray-500/20 text-gray-400'
     }
   }
 
@@ -205,11 +258,20 @@ export default function HistoryPage() {
           </div>
           <button
             onClick={() => window.location.reload()}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--card-border)] hover:bg-[var(--card-bg)] rounded-lg transition-colors self-start"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--card-border)] hover:bg-[var(--card-bg)] rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
           </button>
+          {transactions.length > 0 && (
+            <button
+              onClick={clearHistory}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear
+            </button>
+          )}
         </div>
 
         {/* Filters */}

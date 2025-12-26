@@ -9,6 +9,7 @@ import { XYLO_ROUTER_ABI, ERC20_ABI } from '@/config/abis'
 import { cn, formatNumber } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { TokenLogo } from '@/components/ui/TokenLogos'
+import { saveTransaction } from '@/app/history/page'
 
 type TokenKey = keyof typeof TOKENS
 
@@ -103,11 +104,22 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         success(toastIdRef.current, 'Swap Successful!', swapHash)
         toastIdRef.current = null
       }
+      // Save to history
+      saveTransaction({
+        hash: swapHash,
+        type: 'swap',
+        timestamp: Date.now(),
+        tokenIn: TOKENS[tokenIn].symbol,
+        tokenOut: TOKENS[tokenOut].symbol,
+        amountIn: amountIn,
+        amountOut: amountOut,
+        status: 'success',
+      })
       setAmountIn('')
       setAmountOut('')
       setErrorMsg(null)
     }
-  }, [isSwapConfirmed, swapHash, success])
+  }, [isSwapConfirmed, swapHash, success, tokenIn, tokenOut, amountIn, amountOut])
 
   // Handle errors
   useEffect(() => {
