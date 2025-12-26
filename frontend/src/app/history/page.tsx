@@ -8,34 +8,7 @@ import { CONTRACTS, ARC_NETWORK } from '@/config/constants'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { SkeletonTable } from '@/components/ui/Skeleton'
 import { cn, formatNumber } from '@/lib/utils'
-
-export interface Transaction {
-  hash: string
-  type: 'swap' | 'add_liquidity' | 'remove_liquidity' | 'deposit' | 'withdraw' | 'bridge' | 'approve'
-  timestamp: number
-  tokenIn?: string
-  tokenOut?: string
-  amountIn?: string
-  amountOut?: string
-  status: 'success' | 'pending' | 'failed'
-}
-
-// Helper to save transaction to localStorage
-export function saveTransaction(tx: Transaction) {
-  try {
-    const stored = localStorage.getItem('xylonet_transactions')
-    const transactions: Transaction[] = stored ? JSON.parse(stored) : []
-    // Check if already exists
-    if (!transactions.find(t => t.hash === tx.hash)) {
-      transactions.unshift(tx) // Add to beginning
-      // Keep only last 50 transactions
-      const trimmed = transactions.slice(0, 50)
-      localStorage.setItem('xylonet_transactions', JSON.stringify(trimmed))
-    }
-  } catch (e) {
-    console.error('Failed to save transaction:', e)
-  }
-}
+import { Transaction, loadTransactions, clearTransactions } from '@/lib/transactions'
 
 // Token address to symbol mapping
 const TOKEN_MAP: Record<string, string> = {
@@ -50,22 +23,14 @@ export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'swap' | 'liquidity' | 'vault' | 'bridge'>('all')
 
-  const loadTransactions = () => {
-    // Load from localStorage first
-    try {
-      const stored = localStorage.getItem('xylonet_transactions')
-      if (stored) {
-        const localTxs: Transaction[] = JSON.parse(stored)
-        setTransactions(localTxs)
-      }
-    } catch (e) {
-      console.error('Failed to load transactions:', e)
-    }
+  const handleLoadTransactions = () => {
+    const localTxs = loadTransactions()
+    setTransactions(localTxs)
     setIsLoading(false)
   }
 
-  const clearHistory = () => {
-    localStorage.removeItem('xylonet_transactions')
+  const handleClearHistory = () => {
+    clearTransactions()
     setTransactions([])
   }
 
@@ -76,7 +41,7 @@ export default function HistoryPage() {
       return
     }
 
-    loadTransactions()
+    handleLoadTransactions()
 
     // Also try to fetch from Blockscout API and merge
     const fetchFromBlockscout = async () => {
@@ -265,7 +230,7 @@ export default function HistoryPage() {
           </button>
           {transactions.length > 0 && (
             <button
-              onClick={clearHistory}
+              onClick={handleClearHistory}
               className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />

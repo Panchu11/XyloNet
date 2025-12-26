@@ -9,7 +9,7 @@ import { XYLO_ROUTER_ABI, ERC20_ABI } from '@/config/abis'
 import { cn, formatNumber } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { TokenLogo } from '@/components/ui/TokenLogos'
-import { saveTransaction } from '@/app/history/page'
+import { saveTransaction } from '@/lib/transactions'
 
 type TokenKey = keyof typeof TOKENS
 
