@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "@/components/Providers";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+export const metadata: Metadata = {
+  title: "XyloNet - Stablecoin SuperExchange on Arc",
+  description: "The premier DEX + Bridge on Arc Network. Instant settlement, predictable fees, and native cross-chain transfers powered by Circle CCTP.",
+  keywords: ["DEX", "Bridge", "Arc Network", "Stablecoin", "USDC", "EURC", "DeFi"],
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} font-sans antialiased bg-[var(--background)] text-[var(--text-primary)] min-h-screen flex flex-col`}>
+        <Providers>
+          <Header />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
+      </body>
+    </html>
+  );
+}
