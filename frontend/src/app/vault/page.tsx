@@ -10,6 +10,9 @@ import { cn, formatNumber, formatUSD } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { SkeletonVaultCard } from '@/components/ui/Skeleton'
+import { InfoTooltip } from '@/components/ui/Tooltip'
+import { Confetti } from '@/components/ui/Confetti'
+import { Sparkline } from '@/components/ui/EmptyState'
 
 const ZERO = BigInt(0)
 
@@ -24,6 +27,10 @@ export default function VaultPage() {
   const [needsApproval, setNeedsApproval] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [showConfetti, setShowConfetti] = useState(false)
+
+  // Historical APY data for sparkline
+  const apyHistory = [3.2, 3.5, 3.4, 3.8, 4.0, 3.9, 4.1, 4.2, 4.0, 4.3, 4.1, 4.2]
 
   // Contract writes
   const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract()
@@ -125,6 +132,8 @@ export default function VaultPage() {
         success(toastIdRef.current, 'Deposit Successful!', depositHash)
         toastIdRef.current = null
       }
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 100)
       setDepositAmount('')
       setShowDeposit(false)
       setErrorMsg(null)
@@ -194,6 +203,9 @@ export default function VaultPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] px-4 py-12 bg-[var(--background)]">
+      {/* Confetti celebration */}
+      <Confetti isActive={showConfetti} />
+      
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl" />
@@ -215,21 +227,28 @@ export default function VaultPage() {
 
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <Shield className="w-5 h-5 text-[var(--primary)]" />
-              <span className="text-[var(--text-secondary)]">Total Value Locked</span>
+              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                Total Value Locked
+                <InfoTooltip term="TVL" />
+              </span>
             </div>
             <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(tvl)}</div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-5 h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)]">Current APY</span>
+              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                Current APY
+                <InfoTooltip term="APY" />
+              </span>
             </div>
             <div className="text-3xl font-bold text-[var(--success)]">{apyFormatted}%</div>
+            <Sparkline data={apyHistory} height={30} className="mt-3" color="linear-gradient(to top, #00c9a7, #00e6b8)" />
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-5 h-5 text-[var(--secondary)]" />
               <span className="text-[var(--text-secondary)]">Your Position</span>

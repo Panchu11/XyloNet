@@ -5,7 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Zap } from 'lucide-react'
+import { useAccount } from 'wagmi'
 import { cn } from '@/lib/utils'
 import { XyloNetLogoFallback } from './ui/TokenLogos'
 
@@ -20,9 +21,10 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { isConnected } = useAccount()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--card-border)] bg-[var(--background)]">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--card-border)] bg-[var(--background)]/95 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
@@ -70,6 +72,15 @@ export function Header() {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
+          {/* Network Status - Only show when connected */}
+          {isConnected && (
+            <div className="hidden sm:flex network-status">
+              <div className="network-status-dot connected" />
+              <span className="text-[var(--text-secondary)]">Arc</span>
+              <Zap className="w-3 h-3 text-[var(--success)]" />
+            </div>
+          )}
+          
           {/* Connect Button */}
           <ConnectButton 
             showBalance={false}

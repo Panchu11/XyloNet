@@ -3,13 +3,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi'
 import { parseUnits, formatUnits } from 'viem'
-import { Plus, TrendingUp, Droplets, Loader2, BarChart3, AlertCircle } from 'lucide-react'
+import { Plus, TrendingUp, Droplets, Loader2, BarChart3, AlertCircle, Sparkles } from 'lucide-react'
 import { TOKENS, CONTRACTS } from '@/config/constants'
 import { XYLO_POOL_ABI, ERC20_ABI } from '@/config/abis'
 import { cn, formatNumber, formatUSD } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { SkeletonPoolCard } from '@/components/ui/Skeleton'
+import { InfoTooltip } from '@/components/ui/Tooltip'
+import { Confetti } from '@/components/ui/Confetti'
+import { Sparkline } from '@/components/ui/EmptyState'
 
 // Pool addresses from deployment
 const POOL_ADDRESSES = {
@@ -51,6 +54,10 @@ export default function PoolsPage() {
   const [needsApproval1, setNeedsApproval1] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [showConfetti, setShowConfetti] = useState(false)
+
+  // Simulated volume data for sparklines
+  const volumeData = [12, 19, 15, 22, 18, 25, 20, 28, 24, 30, 27, 35]
 
   // Contract writes
   const { writeContract: writeApprove0, data: approve0Hash, isPending: isApproving0 } = useWriteContract()
@@ -232,6 +239,8 @@ export default function PoolsPage() {
         success(toastIdRef.current, 'Liquidity Added!', addLiqHash)
         toastIdRef.current = null
       }
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 100)
       setAmount0('')
       setAmount1('')
       setShowAddLiquidity(false)
@@ -316,6 +325,9 @@ export default function PoolsPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] px-4 py-12 bg-[var(--background)]">
+      {/* Confetti celebration */}
+      <Confetti isActive={showConfetti} />
+      
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
@@ -337,14 +349,18 @@ export default function PoolsPage() {
 
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <Droplets className="w-5 h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)]">Total Value Locked</span>
+              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                Total Value Locked
+                <InfoTooltip term="TVL" />
+              </span>
             </div>
             <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL)}</div>
+            <Sparkline data={volumeData} height={30} className="mt-3" />
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <BarChart3 className="w-5 h-5 text-[var(--secondary)]" />
               <span className="text-[var(--text-secondary)]">24h Volume (Est.)</span>
@@ -352,7 +368,7 @@ export default function PoolsPage() {
             <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL * 0.05)}</div>
             <div className="text-xs text-[var(--text-muted)] mt-1">~5% daily turnover</div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-5 h-5 text-[var(--primary)]" />
               <span className="text-[var(--text-secondary)]">Your LP Positions</span>
@@ -361,9 +377,9 @@ export default function PoolsPage() {
               {pools.filter(p => p.userLpBalance > ZERO).length}
             </div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)]">
+          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
             <div className="flex items-center gap-3 mb-2">
-              <Plus className="w-5 h-5 text-[var(--accent)]" />
+              <Sparkles className="w-5 h-5 text-[var(--accent)]" />
               <span className="text-[var(--text-secondary)]">Active Pools</span>
             </div>
             <div className="text-3xl font-bold text-[var(--text-primary)]">{pools.length}</div>

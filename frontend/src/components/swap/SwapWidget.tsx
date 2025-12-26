@@ -10,6 +10,9 @@ import { cn, formatNumber } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { saveTransaction } from '@/lib/transactions'
+import { InfoTooltip } from '@/components/ui/Tooltip'
+import { Confetti } from '@/components/ui/Confetti'
+import { USDValue } from '@/components/ui/EmptyState'
 
 type TokenKey = keyof typeof TOKENS
 
@@ -30,6 +33,8 @@ export function SwapWidget({ className }: SwapWidgetProps) {
   const [slippage, setSlippage] = useState('0.5')
   const [showSettings, setShowSettings] = useState(false)
   const [needsApproval, setNeedsApproval] = useState(false)
+  const [swapRotation, setSwapRotation] = useState(0)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   // Contract write hooks
   const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract()
@@ -104,6 +109,9 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         success(toastIdRef.current, 'Swap Successful!', swapHash)
         toastIdRef.current = null
       }
+      // Show confetti celebration
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 100)
       // Save to history
       saveTransaction({
         hash: swapHash,
@@ -161,6 +169,7 @@ export function SwapWidget({ className }: SwapWidgetProps) {
 
   // Swap tokens
   const handleSwapTokens = () => {
+    setSwapRotation(prev => prev + 180)
     setTokenIn(tokenOut)
     setTokenOut(tokenIn)
     setAmountIn(amountOut)
@@ -235,7 +244,10 @@ export function SwapWidget({ className }: SwapWidgetProps) {
 
   return (
     <div className={cn('w-full max-w-md mx-auto', className)}>
-      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4">
+      {/* Confetti celebration */}
+      <Confetti isActive={showConfetti} />
+      
+      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 card-lift">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Swap</h2>
@@ -277,25 +289,36 @@ export function SwapWidget({ className }: SwapWidgetProps) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[var(--text-secondary)]">You pay</span>
             {balanceIn && (
-              <button
-                onClick={() => handleAmountInChange(balanceIn.formatted)}
-                className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-              >
-                Balance: {formatNumber(balanceIn.formatted, 2)}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleAmountInChange(balanceIn.formatted)}
+                  className="max-button"
+                >
+                  MAX
+                </button>
+                <button
+                  onClick={() => handleAmountInChange(balanceIn.formatted)}
+                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  {formatNumber(balanceIn.formatted, 2)}
+                </button>
+              </div>
             )}
           </div>
           <div className="flex items-center gap-3">
-            <input
-              type="number"
-              value={amountIn}
-              onChange={(e) => handleAmountInChange(e.target.value)}
-              placeholder="0.00"
-              className="flex-1 bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
-            />
+            <div className="flex-1">
+              <input
+                type="number"
+                value={amountIn}
+                onChange={(e) => handleAmountInChange(e.target.value)}
+                placeholder="0.00"
+                className="w-full bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+              />
+              <USDValue amount={amountIn} />
+            </div>
             <button
               onClick={() => setShowTokenSelect('in')}
-              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors"
+              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors animate-bounce-subtle"
             >
               <TokenLogo symbol={TOKENS[tokenIn].symbol} size={24} />
               <span className="font-medium text-[var(--text-primary)]">{TOKENS[tokenIn].symbol}</span>
@@ -308,7 +331,8 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         <div className="flex justify-center -my-3 relative z-10">
           <button
             onClick={handleSwapTokens}
-            className="bg-[var(--card-bg)] hover:bg-[var(--card-border)] border-4 border-[var(--background)] rounded-lg p-2 transition-colors"
+            className="bg-[var(--card-bg)] hover:bg-[var(--card-border)] border-4 border-[var(--background)] rounded-lg p-2 transition-all hover:scale-110"
+            style={{ transform: `rotate(${swapRotation}deg)`, transition: 'transform 0.3s ease' }}
           >
             <ArrowDownUp className="w-5 h-5 text-[var(--text-secondary)]" />
           </button>
@@ -325,16 +349,19 @@ export function SwapWidget({ className }: SwapWidgetProps) {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <input
-              type="number"
-              value={amountOut}
-              readOnly
-              placeholder="0.00"
-              className="flex-1 bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
-            />
+            <div className="flex-1">
+              <input
+                type="number"
+                value={amountOut}
+                readOnly
+                placeholder="0.00"
+                className="w-full bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+              />
+              <USDValue amount={amountOut} />
+            </div>
             <button
               onClick={() => setShowTokenSelect('out')}
-              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors"
+              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors animate-bounce-subtle"
             >
               <TokenLogo symbol={TOKENS[tokenOut].symbol} size={24} />
               <span className="font-medium text-[var(--text-primary)]">{TOKENS[tokenOut].symbol}</span>
@@ -362,7 +389,10 @@ export function SwapWidget({ className }: SwapWidgetProps) {
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[var(--text-secondary)]">Price Impact</span>
+              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                Price Impact
+                <InfoTooltip term="PRICE_IMPACT" />
+              </span>
               <span className={cn(
                 priceImpact < 0.1 ? 'text-[var(--success)]' : 
                 priceImpact < 1 ? 'text-[var(--warning)]' : 'text-[var(--error)]'
@@ -371,7 +401,10 @@ export function SwapWidget({ className }: SwapWidgetProps) {
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[var(--text-secondary)]">Network Fee</span>
+              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+                Network Fee
+                <InfoTooltip term="NETWORK_FEE" />
+              </span>
               <span className="text-[var(--text-primary)]">~$0.01</span>
             </div>
           </div>

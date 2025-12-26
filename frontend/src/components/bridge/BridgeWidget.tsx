@@ -9,6 +9,8 @@ import { TOKENS } from '@/config/constants'
 import { cn, formatNumber } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { ChainLogo } from '@/components/ui/TokenLogos'
+import { Confetti } from '@/components/ui/Confetti'
+import { StepIndicator } from '@/components/ui/EmptyState'
 
 // Bridge Kit supported chains for Arc Testnet
 const BRIDGE_CHAINS = [
@@ -44,6 +46,7 @@ export function BridgeWidget() {
   const [currentStep, setCurrentStep] = useState<string>('')
   const [steps, setSteps] = useState<BridgeStep[]>([])
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   // User USDC balance
   const { data: usdcBalance } = useBalance({ address, token: TOKENS.USDC.address })
@@ -136,6 +139,8 @@ export function BridgeWidget() {
 
       // Check result state
       if (result.state === 'success') {
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 100)
         success(toastId, 'Bridge Complete!', result.steps?.[result.steps.length - 1]?.txHash)
         setAmount('')
       } else if (result.state === 'error') {
@@ -170,7 +175,10 @@ export function BridgeWidget() {
 
   return (
     <div className="w-full max-w-lg mx-auto">
-      <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-6">
+      {/* Confetti celebration */}
+      <Confetti isActive={showConfetti} />
+      
+      <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-6 card-lift">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-[var(--text-primary)]">Bridge USDC</h2>

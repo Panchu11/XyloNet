@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { formatUnits } from 'viem'
-import { ArrowRight, ArrowUpDown, Download, Upload, RefreshCw, ExternalLink, Clock, Trash2 } from 'lucide-react'
+import { ArrowRight, ArrowUpDown, Download, Upload, RefreshCw, ExternalLink, Clock, Trash2, History } from 'lucide-react'
+import Link from 'next/link'
 import { CONTRACTS, ARC_NETWORK } from '@/config/constants'
 import { TokenLogo } from '@/components/ui/TokenLogos'
 import { SkeletonTable } from '@/components/ui/Skeleton'
 import { cn, formatNumber } from '@/lib/utils'
 import { Transaction, loadTransactions, clearTransactions } from '@/lib/transactions'
+import { NoTransactionsEmptyState, WalletNotConnectedEmptyState } from '@/components/ui/EmptyState'
 
 // Token address to symbol mapping
 const TOKEN_MAP: Record<string, string> = {
@@ -259,26 +261,40 @@ export default function HistoryPage() {
 
         {/* Content */}
         {!isConnected ? (
-          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-[var(--card-border)] flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-[var(--text-secondary)]" />
-            </div>
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Connect Wallet</h3>
-            <p className="text-[var(--text-secondary)]">Connect your wallet to view transaction history</p>
+          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)]">
+            <WalletNotConnectedEmptyState />
           </div>
         ) : isLoading ? (
           <SkeletonTable />
         ) : filteredTransactions.length === 0 ? (
-          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-12 text-center">
-            <div className="w-16 h-16 rounded-full bg-[var(--card-border)] flex items-center justify-center mx-auto mb-4">
-              <Clock className="w-8 h-8 text-[var(--text-secondary)]" />
-            </div>
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No Transactions</h3>
-            <p className="text-[var(--text-secondary)]">
-              {filter === 'all' 
-                ? "You haven't made any transactions yet" 
-                : `No ${filter} transactions found`}
-            </p>
+          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)]">
+            {filter === 'all' ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">
+                  <History className="w-10 h-10 text-[var(--text-muted)]" />
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">No Transactions Yet</h3>
+                <p className="text-[var(--text-secondary)] max-w-sm mb-6">
+                  Your transaction history will appear here once you start swapping, providing liquidity, or using the vault.
+                </p>
+                <Link
+                  href="/"
+                  className="px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-lg font-semibold transition-all"
+                >
+                  Make Your First Swap
+                </Link>
+              </div>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">
+                  <Clock className="w-10 h-10 text-[var(--text-muted)]" />
+                </div>
+                <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">No {filter.charAt(0).toUpperCase() + filter.slice(1)} Transactions</h3>
+                <p className="text-[var(--text-secondary)]">
+                  No {filter} transactions found. Try a different filter.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] overflow-hidden">
