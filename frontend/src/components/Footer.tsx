@@ -15,21 +15,6 @@ export function Footer() {
             </span>
           </div>
 
-          {/* Team */}
-          <div className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--text-muted)]">Lead Dev</span>
-              <a 
-                href="https://x.com/Panchu2605" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="font-medium text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors"
-              >
-                Panchu
-              </a>
-            </div>
-          </div>
-
           {/* Copyright */}
           <div className="text-xs text-[var(--text-muted)]">
             © {new Date().getFullYear()} XyloNet. All rights reserved.
