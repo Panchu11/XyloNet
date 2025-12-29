@@ -529,14 +529,28 @@ input[type="number"]:focus {
   background: var(--error);
 }
 
-/* Mobile-specific improvements */
+/* ============ Mobile-Specific Improvements ============ */
+
+/* Base mobile styles */
 @media (max-width: 768px) {
-  /* Larger touch targets */
-  button, a {
+  /* Larger touch targets for all interactive elements */
+  button, a, .touch-target {
     min-height: 44px;
   }
   
-  /* Better modal on mobile */
+  /* Better spacing on mobile */
+  .container, .max-w-7xl, .max-w-6xl, .max-w-4xl {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  /* Reduce page padding */
+  .py-12 {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+  
+  /* Better modal on mobile - slide up from bottom */
   .mobile-modal {
     position: fixed;
     bottom: 0;
@@ -558,6 +572,197 @@ input[type="number"]:focus {
     background: var(--card-bg);
     border-top: 1px solid var(--card-border);
     z-index: 40;
+  }
+  
+  /* Smaller card padding on mobile */
+  .p-6 {
+    padding: 16px !important;
+  }
+  
+  /* Better text sizing on mobile */
+  .text-3xl {
+    font-size: 1.5rem !important;
+  }
+  
+  .text-4xl, .text-5xl {
+    font-size: 1.75rem !important;
+  }
+  
+  /* Better grid gaps on mobile */
+  .gap-6 {
+    gap: 12px !important;
+  }
+  
+  /* Full width buttons on mobile */
+  .mobile-full-width {
+    width: 100%;
+  }
+  
+  /* Stack flex items vertically on mobile */
+  .mobile-stack {
+    flex-direction: column;
+  }
+  
+  /* Hide on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  /* Show only on mobile */
+  .mobile-only {
+    display: block;
+  }
+  
+  /* Better input sizing */
+  input[type="number"] {
+    font-size: 18px !important;
+  }
+  
+  /* Card improvements */
+  .card-lift:hover {
+    transform: none;
+  }
+  
+  .card-lift:active {
+    transform: scale(0.98);
+  }
+  
+  /* Horizontal scroll for tables */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  /* Better header on mobile */
+  header .text-lg {
+    font-size: 1rem !important;
+  }
+  
+  /* Compact network status */
+  .network-status {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  
+  /* Footer adjustments */
+  footer .flex-col {
+    gap: 16px !important;
+  }
+  
+  footer .gap-4 {
+    gap: 8px !important;
+  }
+}
+
+/* Extra small screens (below 480px) */
+@media (max-width: 480px) {
+  /* Even smaller text */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.125rem !important;
+  }
+  
+  /* Compact stats cards */
+  .text-3xl {
+    font-size: 1.25rem !important;
+  }
+  
+  /* Smaller icons */
+  .w-5 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  /* Tighter padding */
+  .p-4 {
+    padding: 12px !important;
+  }
+  
+  /* Smaller token logos */
+  .token-logo-large {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  /* Stack pool buttons */
+  .pool-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .pool-actions button {
+    width: 100%;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  .py-12 {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+  
+  .mb-12 {
+    margin-bottom: 16px !important;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on touch devices */
+  .card-hover:hover,
+  .card-lift:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Use active states instead */
+  .card-hover:active,
+  .card-lift:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+  
+  button:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+  
+  /* Disable tooltip on touch */
+  .tooltip:hover .tooltip-content {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Smooth scroll on iOS */
+.scroll-smooth {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }
 

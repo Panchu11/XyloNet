@@ -324,7 +324,7 @@ export default function PoolsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-4 py-12 bg-[var(--background)]">
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
@@ -336,53 +336,63 @@ export default function PoolsPage() {
 
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
             <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] bg-clip-text text-transparent">
               Liquidity Pools
             </span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-lg max-w-xl mx-auto">
+          <p className="text-[var(--text-secondary)] text-sm sm:text-lg max-w-xl mx-auto px-2">
             Provide liquidity to earn swap fees. Optimized StableSwap curve for minimal slippage.
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <Droplets className="w-5 h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)] flex items-center gap-1">
-                Total Value Locked
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
+                <span className="hidden sm:inline">Total Value Locked</span>
+                <span className="sm:hidden">TVL</span>
                 <InfoTooltip term="TVL" />
               </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL)}</div>
-            <Sparkline data={volumeData} height={30} className="mt-3" />
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL)}</div>
+            <Sparkline data={volumeData} height={24} className="mt-2 sm:mt-3 hidden sm:block" />
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <BarChart3 className="w-5 h-5 text-[var(--secondary)]" />
-              <span className="text-[var(--text-secondary)]">24h Volume (Est.)</span>
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--secondary)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                <span className="hidden sm:inline">24h Volume (Est.)</span>
+                <span className="sm:hidden">24h Vol</span>
+              </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL * 0.05)}</div>
-            <div className="text-xs text-[var(--text-muted)] mt-1">~5% daily turnover</div>
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL * 0.05)}</div>
+            <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-0.5 sm:mt-1">~5% daily turnover</div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-[var(--primary)]" />
-              <span className="text-[var(--text-secondary)]">Your LP Positions</span>
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                <span className="hidden sm:inline">Your LP Positions</span>
+                <span className="sm:hidden">Positions</span>
+              </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">
               {pools.filter(p => p.userLpBalance > ZERO).length}
             </div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-              <span className="text-[var(--text-secondary)]">Active Pools</span>
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                <span className="hidden sm:inline">Active Pools</span>
+                <span className="sm:hidden">Pools</span>
+              </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">{pools.length}</div>
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{pools.length}</div>
           </div>
         </div>
 
@@ -392,7 +402,7 @@ export default function PoolsPage() {
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">All Pools</h2>
           </div>
           
-          {/* Table Header */}
+          {/* Table Header - Desktop only */}
           <div className="hidden md:grid grid-cols-6 gap-4 px-6 py-3 text-sm text-gray-400 border-b border-white/5">
             <div>Pool</div>
             <div className="text-right">TVL</div>
@@ -412,20 +422,68 @@ export default function PoolsPage() {
             return (
               <div
                 key={pool.id}
-                className="grid grid-cols-2 md:grid-cols-6 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                className="flex flex-col md:grid md:grid-cols-6 gap-3 md:gap-4 px-4 sm:px-6 py-4 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    <TokenLogo symbol={pool.token0.symbol} size={32} className="border-2 border-gray-900 rounded-full" />
-                    <TokenLogo symbol={pool.token1.symbol} size={32} className="border-2 border-gray-900 rounded-full" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-white">
-                      {pool.token0.symbol}/{pool.token1.symbol}
+                {/* Mobile: Pool name and actions on same row */}
+                <div className="flex items-center justify-between md:justify-start md:gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      <TokenLogo symbol={pool.token0.symbol} size={28} className="border-2 border-gray-900 rounded-full sm:w-8 sm:h-8" />
+                      <TokenLogo symbol={pool.token1.symbol} size={28} className="border-2 border-gray-900 rounded-full sm:w-8 sm:h-8" />
                     </div>
-                    <div className="text-sm text-gray-400">StableSwap</div>
+                    <div>
+                      <div className="font-medium text-white text-sm sm:text-base">
+                        {pool.token0.symbol}/{pool.token1.symbol}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-400">StableSwap</div>
+                    </div>
+                  </div>
+                  {/* Mobile actions */}
+                  <div className="flex gap-2 md:hidden">
+                    <button
+                      onClick={() => {
+                        setSelectedPool(pool)
+                        setShowAddLiquidity(true)
+                      }}
+                      className="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-lg text-xs font-medium transition-colors min-h-[36px]"
+                    >
+                      Add
+                    </button>
+                    {pool.userLpBalance > ZERO && (
+                      <button
+                        onClick={() => {
+                          setSelectedPool(pool)
+                          setShowRemoveLiquidity(true)
+                        }}
+                        className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-xs font-medium transition-colors min-h-[36px]"
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
                 </div>
+
+                {/* Mobile: Stats grid */}
+                <div className="grid grid-cols-2 gap-2 md:hidden text-sm">
+                  <div className="bg-white/5 rounded-lg p-2">
+                    <div className="text-gray-400 text-xs">TVL</div>
+                    <div className="text-white font-medium">{formatUSD(tvl)}</div>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-2">
+                    <div className="text-gray-400 text-xs">24h Fees</div>
+                    <div className="text-green-400 font-medium">{formatUSD(dailyFees)}</div>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-2">
+                    <div className="text-gray-400 text-xs">Your LP</div>
+                    <div className="text-white font-medium">{formatNumber(formatUnits(pool.userLpBalance, 18), 4)}</div>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-2">
+                    <div className="text-gray-400 text-xs">Your Share</div>
+                    <div className="text-green-400 font-medium">{formatNumber(userShare, 2)}%</div>
+                  </div>
+                </div>
+
+                {/* Desktop columns */}
                 <div className="text-right text-white hidden md:block">{formatUSD(tvl)}</div>
                 <div className="text-right hidden md:block">
                   <span className="text-green-400">{formatUSD(dailyFees)}</span>
@@ -436,7 +494,7 @@ export default function PoolsPage() {
                 <div className="text-right hidden md:block">
                   <span className="text-green-400 font-medium">{formatNumber(userShare, 2)}%</span>
                 </div>
-                <div className="flex justify-end gap-2 col-span-2 md:col-span-1">
+                <div className="hidden md:flex justify-end gap-2">
                   <button
                     onClick={() => {
                       setSelectedPool(pool)
@@ -464,13 +522,13 @@ export default function PoolsPage() {
         </div>
 
         {/* Add Liquidity Info */}
-        <div className="mt-8 p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-500/20">
-          <h3 className="text-lg font-semibold text-white mb-2">Earn Fees as a Liquidity Provider</h3>
-          <p className="text-gray-400 mb-4">
+        <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-500/20">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Earn Fees as a Liquidity Provider</h3>
+          <p className="text-gray-400 text-sm sm:text-base mb-4">
             When you add liquidity, you receive LP tokens representing your share of the pool. 
             Earn 0.04% of all trades proportional to your share. StableSwap curve ensures minimal impermanent loss for stablecoin pairs.
           </p>
-          <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-400" />
               <span className="text-gray-300">0.04% swap fee</span>
@@ -489,15 +547,15 @@ export default function PoolsPage() {
 
       {/* Add Liquidity Modal */}
       {showAddLiquidity && selectedPool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-xl border border-white/10 p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-t-xl sm:rounded-xl border border-white/10 p-4 sm:p-6 w-full max-w-md sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-white">
                 Add Liquidity to {selectedPool.token0.symbol}/{selectedPool.token1.symbol}
               </h3>
               <button
                 onClick={() => { setShowAddLiquidity(false); setAmount0(''); setAmount1(''); }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <span className="text-gray-400">✕</span>
               </button>
@@ -519,7 +577,7 @@ export default function PoolsPage() {
                   value={amount0}
                   onChange={(e) => setAmount0(e.target.value)}
                   placeholder="0.00"
-                  className="w-full bg-transparent text-2xl font-medium text-white outline-none"
+                  className="w-full bg-transparent text-xl sm:text-2xl font-medium text-white outline-none"
                 />
               </div>
 
@@ -538,7 +596,7 @@ export default function PoolsPage() {
                   value={amount1}
                   onChange={(e) => setAmount1(e.target.value)}
                   placeholder="0.00"
-                  className="w-full bg-transparent text-2xl font-medium text-white outline-none"
+                  className="w-full bg-transparent text-xl sm:text-2xl font-medium text-white outline-none"
                 />
               </div>
 
@@ -575,9 +633,9 @@ export default function PoolsPage() {
                 onClick={handleAddLiquidity}
                 disabled={!isConnected || !amount0 || !amount1 || needsApproval0 || needsApproval1 || isLoading}
                 className={cn(
-                  'w-full py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2',
+                  'w-full py-3.5 sm:py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px]',
                   isConnected && amount0 && amount1 && !needsApproval0 && !needsApproval1 && !isLoading
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white active:scale-[0.98]'
                     : 'bg-white/10 text-gray-500 cursor-not-allowed'
                 )}
               >
@@ -598,15 +656,15 @@ export default function PoolsPage() {
 
       {/* Remove Liquidity Modal */}
       {showRemoveLiquidity && selectedPool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-xl border border-white/10 p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-t-xl sm:rounded-xl border border-white/10 p-4 sm:p-6 w-full max-w-md sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-white">
                 Remove Liquidity from {selectedPool.token0.symbol}/{selectedPool.token1.symbol}
               </h3>
               <button
                 onClick={() => { setShowRemoveLiquidity(false); setLpAmount(''); }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <span className="text-gray-400">✕</span>
               </button>
@@ -628,7 +686,7 @@ export default function PoolsPage() {
                   value={lpAmount}
                   onChange={(e) => setLpAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full bg-transparent text-2xl font-medium text-white outline-none"
+                  className="w-full bg-transparent text-xl sm:text-2xl font-medium text-white outline-none"
                 />
               </div>
 
@@ -636,9 +694,9 @@ export default function PoolsPage() {
                 onClick={handleRemoveLiquidity}
                 disabled={!isConnected || !lpAmount || isLoading}
                 className={cn(
-                  'w-full py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2',
+                  'w-full py-3.5 sm:py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px]',
                   isConnected && lpAmount && !isLoading
-                    ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white'
+                    ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white active:scale-[0.98]'
                     : 'bg-white/10 text-gray-500 cursor-not-allowed'
                 )}
               >

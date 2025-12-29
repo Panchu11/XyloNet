@@ -243,14 +243,14 @@ export function SwapWidget({ className }: SwapWidgetProps) {
   }, [amountIn, exchangeRate])
 
   return (
-    <div className={cn('w-full max-w-md mx-auto', className)}>
+    <div className={cn('w-full max-w-md mx-auto px-2 sm:px-0', className)}>
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
-      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 card-lift">
+      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-3 sm:p-4 card-lift">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Swap</h2>
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <h2 className="text-base sm:text-lg font-semibold text-[var(--text-primary)]">Swap</h2>
           <button
             onClick={() => setShowSettings(!showSettings)}
             className="p-2 rounded-lg hover:bg-[var(--card-border)] transition-colors"
@@ -285,7 +285,7 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         )}
 
         {/* Token In */}
-        <div className="bg-[var(--card-border)] rounded-lg p-4 mb-2">
+        <div className="bg-[var(--card-border)] rounded-lg p-3 sm:p-4 mb-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[var(--text-secondary)]">You pay</span>
             {balanceIn && (
@@ -306,23 +306,23 @@ export function SwapWidget({ className }: SwapWidgetProps) {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <input
                 type="number"
                 value={amountIn}
                 onChange={(e) => handleAmountInChange(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+                className="w-full bg-transparent text-xl sm:text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
               />
               <USDValue amount={amountIn} />
             </div>
             <button
               onClick={() => setShowTokenSelect('in')}
-              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors animate-bounce-subtle"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-2.5 sm:px-3 py-1.5 sm:py-2 transition-colors animate-bounce-subtle flex-shrink-0"
             >
-              <TokenLogo symbol={TOKENS[tokenIn].symbol} size={24} />
-              <span className="font-medium text-[var(--text-primary)]">{TOKENS[tokenIn].symbol}</span>
-              <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
+              <TokenLogo symbol={TOKENS[tokenIn].symbol} size={20} className="sm:w-6 sm:h-6" />
+              <span className="font-medium text-[var(--text-primary)] text-sm sm:text-base">{TOKENS[tokenIn].symbol}</span>
+              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
             </button>
           </div>
         </div>
@@ -339,7 +339,7 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         </div>
 
         {/* Token Out */}
-        <div className="bg-[var(--card-border)] rounded-lg p-4 mt-2">
+        <div className="bg-[var(--card-border)] rounded-lg p-3 sm:p-4 mt-2">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[var(--text-secondary)]">You receive</span>
             {balanceOut && (
@@ -349,23 +349,23 @@ export function SwapWidget({ className }: SwapWidgetProps) {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <input
                 type="number"
                 value={amountOut}
                 readOnly
                 placeholder="0.00"
-                className="w-full bg-transparent text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+                className="w-full bg-transparent text-xl sm:text-2xl font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
               />
               <USDValue amount={amountOut} />
             </div>
             <button
               onClick={() => setShowTokenSelect('out')}
-              className="flex items-center gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-3 py-2 transition-colors animate-bounce-subtle"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-full px-2.5 sm:px-3 py-1.5 sm:py-2 transition-colors animate-bounce-subtle flex-shrink-0"
             >
-              <TokenLogo symbol={TOKENS[tokenOut].symbol} size={24} />
-              <span className="font-medium text-[var(--text-primary)]">{TOKENS[tokenOut].symbol}</span>
-              <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
+              <TokenLogo symbol={TOKENS[tokenOut].symbol} size={20} className="sm:w-6 sm:h-6" />
+              <span className="font-medium text-[var(--text-primary)] text-sm sm:text-base">{TOKENS[tokenOut].symbol}</span>
+              <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-secondary)]" />
             </button>
           </div>
         </div>
@@ -415,7 +415,7 @@ export function SwapWidget({ className }: SwapWidgetProps) {
           onClick={handleSwap}
           disabled={!isConnected || !amountIn || isLoading}
           className={cn(
-            'w-full mt-4 py-4 rounded-lg font-semibold text-lg transition-all',
+            'w-full mt-4 py-3.5 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all min-h-[48px]',
             isConnected && amountIn && !isLoading
               ? 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
               : 'bg-[var(--card-border)] text-[var(--text-muted)] cursor-not-allowed'
@@ -438,16 +438,16 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         </button>
 
         {/* Arc Network Badge */}
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[var(--text-muted)]">
-          <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+        <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[var(--text-muted)] text-center">
+          <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse flex-shrink-0" />
           <span>Powered by Arc Network • Sub-second finality • ~$0.01 fees</span>
         </div>
       </div>
 
       {/* Token Select Modal */}
       {showTokenSelect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-4 w-full max-w-sm mx-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-[var(--card-bg)] rounded-t-xl sm:rounded-xl border border-[var(--card-border)] p-4 w-full max-w-sm sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-[var(--text-primary)]">Select Token</h3>
               <button
@@ -457,16 +457,16 @@ export function SwapWidget({ className }: SwapWidgetProps) {
                 <span className="text-[var(--text-secondary)]">✕</span>
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               {(Object.keys(TOKENS) as TokenKey[]).map((key) => {
                 const token = TOKENS[key]
                 return (
                   <button
                     key={key}
                     onClick={() => handleTokenSelect(key)}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--card-border)] transition-colors"
+                    className="w-full flex items-center gap-3 p-3 sm:p-3 rounded-lg hover:bg-[var(--card-border)] active:bg-[var(--card-border)] transition-colors min-h-[56px]"
                   >
-                    <TokenLogo symbol={token.symbol} size={40} />
+                    <TokenLogo symbol={token.symbol} size={36} />
                     <div className="flex-1 text-left">
                       <div className="font-medium text-[var(--text-primary)]">{token.symbol}</div>
                       <div className="text-sm text-[var(--text-secondary)]">{token.name}</div>

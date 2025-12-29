@@ -174,15 +174,15 @@ export function BridgeWidget() {
   const bridgeFee = amount ? `~${(parseFloat(amount) * 0.001).toFixed(4)} USDC` : '~0.1%'
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-lg mx-auto px-2 sm:px-0">
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
-      <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-6 card-lift">
+      <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-4 sm:p-6 card-lift">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Bridge USDC</h2>
-          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">Bridge USDC</h2>
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-[var(--text-secondary)]">
             <span>Powered by</span>
             <span className="font-semibold text-[var(--text-primary)]">Circle Bridge Kit</span>
           </div>
@@ -269,29 +269,29 @@ export function BridgeWidget() {
         )}
 
         {/* Source Chain */}
-        <div className="bg-[var(--card-border)] rounded-lg p-4 mb-2">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-[var(--text-secondary)]">From</span>
+        <div className="bg-[var(--card-border)] rounded-lg p-3 sm:p-4 mb-2">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-xs sm:text-sm text-[var(--text-secondary)]">From</span>
             <button
               onClick={() => setAmount(usdcBalance?.formatted ?? '0')}
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] truncate"
+              className="text-xs sm:text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] truncate"
             >
               Balance: {formatNumber(usdcBalance?.formatted ?? '0', 2)} USDC
             </button>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2 bg-[var(--card-bg)] rounded-lg px-3 py-2 flex-shrink-0">
-              <ChainLogo name={sourceChain.name} size={28} />
+              <ChainLogo name={sourceChain.name} size={24} className="sm:w-7 sm:h-7" />
               <span className="font-medium text-[var(--text-primary)] text-sm whitespace-nowrap">{sourceChain.name}</span>
             </div>
-            <div className="flex-1 flex items-center gap-2 min-w-0">
+            <div className="flex-1 flex items-center gap-2 min-w-0 bg-[var(--card-bg)] sm:bg-transparent rounded-lg px-3 py-2 sm:p-0">
               <input
                 type="number"
                 value={amount}
                 onChange={(e) => { setAmount(e.target.value); setBridgeResult(null); setErrorMsg(null); }}
                 placeholder="0.00"
                 disabled={isBridging}
-                className="flex-1 min-w-0 bg-transparent text-xl font-medium text-[var(--text-primary)] outline-none text-right placeholder:text-[var(--text-muted)] disabled:opacity-50"
+                className="flex-1 min-w-0 bg-transparent text-lg sm:text-xl font-medium text-[var(--text-primary)] outline-none text-right placeholder:text-[var(--text-muted)] disabled:opacity-50"
               />
               <span className="font-medium text-[var(--text-secondary)] flex-shrink-0">USDC</span>
             </div>
@@ -306,25 +306,27 @@ export function BridgeWidget() {
         </div>
 
         {/* Destination Chain */}
-        <div className="bg-[var(--card-border)] rounded-lg p-4 mt-2">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-[var(--text-secondary)]">To</span>
+        <div className="bg-[var(--card-border)] rounded-lg p-3 sm:p-4 mt-2">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <span className="text-xs sm:text-sm text-[var(--text-secondary)]">To</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
             <button
               onClick={() => setShowDestSelect(!showDestSelect)}
               disabled={isBridging}
-              className="flex items-center gap-3 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-lg px-4 py-3 transition-colors disabled:opacity-50"
+              className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3 bg-[var(--card-bg)] hover:bg-[var(--card-border)] rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 transition-colors disabled:opacity-50 min-h-[48px]"
             >
-              <ChainLogo name={destChain.name} size={32} />
-              <span className="font-medium text-[var(--text-primary)]">{destChain.name}</span>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <ChainLogo name={destChain.name} size={28} className="sm:w-8 sm:h-8" />
+                <span className="font-medium text-[var(--text-primary)] text-sm sm:text-base">{destChain.name}</span>
+              </div>
               <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
             </button>
-            <div className="flex-1 text-right">
-              <div className="text-2xl font-medium text-[var(--text-primary)]">
+            <div className="flex-1 text-right bg-[var(--card-bg)] sm:bg-transparent rounded-lg px-3 py-2 sm:p-0">
+              <div className="text-xl sm:text-2xl font-medium text-[var(--text-primary)]">
                 {amount || '0.00'}
               </div>
-              <div className="text-sm text-[var(--text-secondary)]">
+              <div className="text-xs sm:text-sm text-[var(--text-secondary)]">
                 You will receive
               </div>
             </div>
@@ -370,26 +372,26 @@ export function BridgeWidget() {
           onClick={handleBridge}
           disabled={!isConnected || !amount || isBridging || parseFloat(amount) <= 0}
           className={cn(
-            'w-full mt-4 py-4 rounded-lg font-semibold text-lg transition-all flex items-center justify-center gap-2',
+            'w-full mt-4 py-3.5 sm:py-4 rounded-lg font-semibold text-base sm:text-lg transition-all flex items-center justify-center gap-2 min-h-[48px]',
             isConnected && amount && !isBridging && parseFloat(amount) > 0
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white'
+              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white active:scale-[0.98]'
               : 'bg-[var(--card-border)] text-[var(--text-muted)] cursor-not-allowed'
           )}
         >
           {isBridging ? (
-            <><Loader2 className="w-5 h-5 animate-spin" /> {currentStep || 'Bridging...'}</>
+            <><Loader2 className="w-5 h-5 animate-spin" /> <span className="truncate">{currentStep || 'Bridging...'}</span></>
           ) : !isConnected ? (
             'Connect Wallet'
           ) : !amount || parseFloat(amount) <= 0 ? (
             'Enter Amount'
           ) : (
-            `Bridge to ${destChain.name}`
+            <span className="truncate">Bridge to {destChain.name}</span>
           )}
         </button>
 
         {/* Arc Network Badge */}
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[var(--text-muted)]">
-          <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+        <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2 text-[10px] sm:text-xs text-[var(--text-muted)] text-center">
+          <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse flex-shrink-0" />
           <span>Circle CCTP V2 • Fast Transfer • Auto-Delivery</span>
         </div>
 
@@ -408,20 +410,20 @@ export function BridgeWidget() {
 
       {/* Chain Select Modal */}
       {showDestSelect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] p-4 w-full max-w-sm mx-4">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-[var(--card-bg)] rounded-t-xl sm:rounded-xl border border-[var(--card-border)] p-4 w-full max-w-sm sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 sticky top-0 bg-[var(--card-bg)] pb-2">
               <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                 Select Destination Chain
               </h3>
               <button
                 onClick={() => setShowDestSelect(false)}
-                className="p-2 rounded-lg hover:bg-[var(--card-border)] transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--card-border)] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <span className="text-[var(--text-secondary)]">✕</span>
               </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               {BRIDGE_CHAINS.filter(c => c.id !== 'Arc_Testnet').map((chain) => (
                 <button
                   key={chain.id}
@@ -430,13 +432,13 @@ export function BridgeWidget() {
                     setShowDestSelect(false)
                   }}
                   className={cn(
-                    'w-full flex items-center gap-3 p-3 rounded-lg transition-colors',
+                    'w-full flex items-center gap-3 p-3 rounded-lg transition-colors min-h-[56px]',
                     destChain.id === chain.id
                       ? 'bg-[var(--primary)]/20 border border-[var(--primary)]/50'
-                      : 'hover:bg-[var(--card-border)]'
+                      : 'hover:bg-[var(--card-border)] active:bg-[var(--card-border)]'
                   )}
                 >
-                  <ChainLogo name={chain.name} size={40} />
+                  <ChainLogo name={chain.name} size={36} />
                   <div className="flex-1 text-left">
                     <div className="font-medium text-[var(--text-primary)]">{chain.name}</div>
                     <div className="text-sm text-[var(--text-secondary)]">Chain ID: {chain.chainId}</div>

@@ -202,7 +202,7 @@ export default function VaultPage() {
   const apyFormatted = apy.toFixed(2) // Format to 2 decimal places
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-4 py-12 bg-[var(--background)]">
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
@@ -214,92 +214,93 @@ export default function VaultPage() {
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
             <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] bg-clip-text text-transparent">
               USDC Yield Vault
             </span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-lg max-w-xl mx-auto">
+          <p className="text-[var(--text-secondary)] text-sm sm:text-lg max-w-xl mx-auto px-2">
             Deposit USDC to earn yield. Auto-compounding strategy optimized for Arc Network.
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <Shield className="w-5 h-5 text-[var(--primary)]" />
-              <span className="text-[var(--text-secondary)] flex items-center gap-1">
-                Total Value Locked
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
+                <span className="hidden sm:inline">Total Value Locked</span>
+                <span className="sm:hidden">TVL</span>
                 <InfoTooltip term="TVL" />
               </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(tvl)}</div>
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(tvl)}</div>
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)] flex items-center gap-1">
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
                 Current APY
                 <InfoTooltip term="APY" />
               </span>
             </div>
-            <div className="text-3xl font-bold text-[var(--success)]">{apyFormatted}%</div>
-            <Sparkline data={apyHistory} height={30} className="mt-3" color="linear-gradient(to top, #00c9a7, #00e6b8)" />
+            <div className="text-xl sm:text-3xl font-bold text-[var(--success)]">{apyFormatted}%</div>
+            <Sparkline data={apyHistory} height={24} className="mt-2 sm:mt-3 hidden sm:block" color="linear-gradient(to top, #00c9a7, #00e6b8)" />
           </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-5 h-5 text-[var(--secondary)]" />
-              <span className="text-[var(--text-secondary)]">Your Position</span>
+          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--secondary)]" />
+              <span className="text-[var(--text-secondary)] text-xs sm:text-base">Your Position</span>
             </div>
-            <div className="text-3xl font-bold text-[var(--text-primary)]">{formatUSD(userAssetsValue)}</div>
+            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(userAssetsValue)}</div>
           </div>
         </div>
 
         {/* Vault Card */}
         <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-xl bg-[var(--primary)] flex items-center justify-center overflow-hidden">
-                <TokenLogo symbol="USDC" size={48} />
+          <div className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-[var(--primary)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                <TokenLogo symbol="USDC" size={36} className="sm:w-12 sm:h-12" />
               </div>
-              <div>
-                <h3 className="text-xl font-semibold text-[var(--text-primary)]">XyloNet USDC Vault</h3>
-                <p className="text-[var(--text-secondary)]">Deposit USDC and receive xyUSDC vault shares</p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="bg-white/5 rounded-lg p-4">
-                <div className="text-sm text-gray-400 mb-1">Your Shares (xyUSDC)</div>
-                <div className="text-2xl font-bold text-white">{formatNumber(userSharesFormatted, 4)}</div>
-              </div>
-              <div className="bg-white/5 rounded-lg p-4">
-                <div className="text-sm text-gray-400 mb-1">Value in USDC</div>
-                <div className="text-2xl font-bold text-white">{formatUSD(userAssetsValue)}</div>
+              <div className="min-w-0">
+                <h3 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">XyloNet USDC Vault</h3>
+                <p className="text-[var(--text-secondary)] text-sm sm:text-base truncate">Deposit USDC and receive xyUSDC vault shares</p>
               </div>
             </div>
 
-            <div className="p-4 bg-white/5 rounded-lg mb-6">
-              <div className="text-sm text-gray-400 mb-2">Strategy</div>
-              <p className="text-gray-300">
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-6">
+              <div className="bg-white/5 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-gray-400 mb-0.5 sm:mb-1">Your Shares (xyUSDC)</div>
+                <div className="text-lg sm:text-2xl font-bold text-white truncate">{formatNumber(userSharesFormatted, 4)}</div>
+              </div>
+              <div className="bg-white/5 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-gray-400 mb-0.5 sm:mb-1">Value in USDC</div>
+                <div className="text-lg sm:text-2xl font-bold text-white">{formatUSD(userAssetsValue)}</div>
+              </div>
+            </div>
+
+            <div className="p-3 sm:p-4 bg-white/5 rounded-lg mb-4 sm:mb-6">
+              <div className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">Strategy</div>
+              <p className="text-gray-300 text-sm sm:text-base">
                 This vault accepts USDC deposits and issues xyUSDC shares. The vault can be used for 
                 yield generation through various DeFi strategies on Arc Network.
               </p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => setShowDeposit(true)}
-                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
               >
                 Deposit USDC
               </button>
               {(userShares as bigint) > ZERO && (
                 <button
                   onClick={() => setShowWithdraw(true)}
-                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-all"
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-all min-h-[48px] active:scale-[0.98]"
                 >
                   Withdraw
                 </button>
@@ -309,14 +310,14 @@ export default function VaultPage() {
         </div>
 
         {/* USYC Info */}
-        <div className="mt-12 p-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">💎</span>
+        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-xl sm:text-2xl">💎</span>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white mb-2">About Arc Vaults</h3>
-              <p className="text-gray-400 mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">About Arc Vaults</h3>
+              <p className="text-gray-400 text-sm sm:text-base mb-3 sm:mb-4">
                 XyloNet vaults leverage Arc Network&apos;s unique features including sub-second finality 
                 and native USDC gas to optimize yield strategies. Deposits are managed by the vault contract.
               </p>
@@ -324,7 +325,7 @@ export default function VaultPage() {
                 href={`https://testnet.arcscan.app/address/${CONTRACTS.VAULT}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base"
               >
                 View Vault Contract
                 <ChevronRight className="w-4 h-4" />
@@ -336,13 +337,13 @@ export default function VaultPage() {
 
       {/* Deposit Modal */}
       {showDeposit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-xl border border-white/10 p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Deposit USDC</h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-t-xl sm:rounded-xl border border-white/10 p-4 sm:p-6 w-full max-w-md sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-white">Deposit USDC</h3>
               <button
                 onClick={() => { setShowDeposit(false); setDepositAmount(''); }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <span className="text-gray-400">✕</span>
               </button>
@@ -364,7 +365,7 @@ export default function VaultPage() {
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full bg-transparent text-2xl font-medium text-white outline-none"
+                  className="w-full bg-transparent text-xl sm:text-2xl font-medium text-white outline-none"
                 />
               </div>
 
@@ -399,9 +400,9 @@ export default function VaultPage() {
                 onClick={handleDeposit}
                 disabled={!isConnected || !depositAmount || needsApproval || isLoading}
                 className={cn(
-                  'w-full py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2',
+                  'w-full py-3.5 sm:py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px]',
                   isConnected && depositAmount && !needsApproval && !isLoading
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white active:scale-[0.98]'
                     : 'bg-white/10 text-gray-500 cursor-not-allowed'
                 )}
               >
@@ -422,13 +423,13 @@ export default function VaultPage() {
 
       {/* Withdraw Modal */}
       {showWithdraw && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-xl border border-white/10 p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">Withdraw from Vault</h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-t-xl sm:rounded-xl border border-white/10 p-4 sm:p-6 w-full max-w-md sm:mx-4 safe-area-bottom animate-slide-up sm:animate-scale-in">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-semibold text-white">Withdraw from Vault</h3>
               <button
                 onClick={() => { setShowWithdraw(false); setWithdrawAmount(''); }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 <span className="text-gray-400">✕</span>
               </button>
@@ -450,7 +451,7 @@ export default function VaultPage() {
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full bg-transparent text-2xl font-medium text-white outline-none"
+                  className="w-full bg-transparent text-xl sm:text-2xl font-medium text-white outline-none"
                 />
               </div>
 
@@ -465,9 +466,9 @@ export default function VaultPage() {
                 onClick={handleWithdraw}
                 disabled={!isConnected || !withdrawAmount || isLoading}
                 className={cn(
-                  'w-full py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2',
+                  'w-full py-3.5 sm:py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px]',
                   isConnected && withdrawAmount && !isLoading
-                    ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white'
+                    ? 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white active:scale-[0.98]'
                     : 'bg-white/10 text-gray-500 cursor-not-allowed'
                 )}
               >

@@ -32,11 +32,11 @@ function GalxeLogo({ className }: { className?: string }) {
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+    <footer className="border-t border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-sm safe-area-bottom">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
           {/* Credits */}
-          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-[var(--text-secondary)] order-2 sm:order-1">
             <span>Built with</span>
             <span className="text-red-500">♥</span>
             <span>by</span>
@@ -46,39 +46,39 @@ export function Footer() {
           </div>
 
           {/* Social Links */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 order-1 sm:order-2">
             {/* X (Twitter) */}
             <a
               href="https://x.com/Xylonet_"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all duration-200 group"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all duration-200 group min-h-[40px]"
               title="Follow us on X"
             >
               <XLogo className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors" />
-              <span className="text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
+              <span className="text-xs sm:text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
                 Follow
               </span>
             </a>
 
             {/* Galxe */}
             <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] opacity-60 cursor-not-allowed"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] opacity-60 cursor-not-allowed min-h-[40px]"
               title="Galxe - Coming Soon"
             >
               <GalxeLogo className="w-4 h-4 text-[var(--text-muted)]" />
-              <span className="text-sm text-[var(--text-muted)]">
+              <span className="text-xs sm:text-sm text-[var(--text-muted)]">
                 Galxe
               </span>
-              <span className="text-xs text-[var(--text-muted)] bg-[var(--surface)] px-1.5 py-0.5 rounded">
-                Coming Soon
+              <span className="text-[10px] sm:text-xs text-[var(--text-muted)] bg-[var(--surface)] px-1 sm:px-1.5 py-0.5 rounded">
+                Soon
               </span>
             </div>
           </div>
 
           {/* Copyright */}
-          <div className="text-xs text-[var(--text-muted)]">
-            © {new Date().getFullYear()} XyloNet. All rights reserved.
+          <div className="text-[10px] sm:text-xs text-[var(--text-muted)] order-3">
+            © {new Date().getFullYear()} XyloNet
           </div>
         </div>
       </div>

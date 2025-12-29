@@ -203,52 +203,54 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-4 py-12 bg-[var(--background)]">
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
       {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">
               <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Transaction History
               </span>
             </h1>
-            <p className="text-[var(--text-secondary)]">
+            <p className="text-[var(--text-secondary)] text-sm sm:text-base">
               View your recent swaps, liquidity, and vault transactions
             </p>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--card-border)] hover:bg-[var(--card-bg)] rounded-lg transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
-          {transactions.length > 0 && (
+          <div className="flex flex-wrap gap-2">
             <button
-              onClick={handleClearHistory}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-[var(--card-border)] hover:bg-[var(--card-bg)] rounded-lg transition-colors text-sm min-h-[40px]"
             >
-              <Trash2 className="w-4 h-4" />
-              Clear
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
-          )}
+            {transactions.length > 0 && (
+              <button
+                onClick={handleClearHistory}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors text-sm min-h-[40px]"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 -mx-1 px-1">
           {(['all', 'swap', 'liquidity', 'vault', 'bridge'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-all',
+                'px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-h-[40px]',
                 filter === f
                   ? 'bg-[var(--primary)] text-white'
                   : 'bg-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-primary)]'
@@ -298,7 +300,8 @@ export default function HistoryPage() {
           </div>
         ) : (
           <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[var(--card-border)]">
@@ -366,6 +369,60 @@ export default function HistoryPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card List */}
+            <div className="md:hidden divide-y divide-[var(--card-border)]">
+              {filteredTransactions.map((tx) => (
+                <div key={tx.hash} className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={cn(
+                      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs',
+                      getTypeColor(tx.type)
+                    )}>
+                      {getTypeIcon(tx.type)}
+                      {getTypeLabel(tx.type)}
+                    </div>
+                    <span className={cn(
+                      'inline-flex items-center gap-1 text-xs',
+                      tx.status === 'success' ? 'text-[var(--success)]' :
+                      tx.status === 'pending' ? 'text-[var(--warning)]' : 'text-[var(--error)]'
+                    )}>
+                      <span className={cn(
+                        'w-1.5 h-1.5 rounded-full',
+                        tx.status === 'success' ? 'bg-[var(--success)]' :
+                        tx.status === 'pending' ? 'bg-[var(--warning)] animate-pulse' : 'bg-[var(--error)]'
+                      )} />
+                      {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
+                    </span>
+                  </div>
+                  
+                  {tx.type === 'swap' && tx.tokenIn && tx.tokenOut && (
+                    <div className="flex items-center gap-2 mb-3 text-sm">
+                      <TokenLogo symbol={tx.tokenIn} size={18} />
+                      <span className="text-[var(--text-primary)]">{tx.amountIn ? formatNumber(tx.amountIn, 2) : '?'} {tx.tokenIn}</span>
+                      <ArrowRight className="w-3 h-3 text-[var(--text-muted)]" />
+                      <TokenLogo symbol={tx.tokenOut} size={18} />
+                      <span className="text-[var(--text-primary)]">{tx.tokenOut}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[var(--text-secondary)]">
+                      {formatTime(tx.timestamp)}
+                    </span>
+                    <a
+                      href={`${ARC_NETWORK.explorer}/tx/${tx.hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-[var(--primary)] hover:text-[var(--primary-hover)] min-h-[36px] px-2"
+                    >
+                      View
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
