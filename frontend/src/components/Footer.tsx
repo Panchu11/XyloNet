@@ -14,16 +14,18 @@ function XLogo({ className }: { className?: string }) {
   )
 }
 
-// Galxe Logo
+// Official Galxe Logomark (Comet design)
 function GalxeLogo({ className }: { className?: string }) {
   return (
     <svg 
-      viewBox="0 0 24 24" 
+      viewBox="147 73.518 128.172 82"
       className={className}
       fill="currentColor"
       aria-hidden="true"
     >
-      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+      <path d="m235.853 83.215-80.245 46.282 74.553-54.963a5.198 5.198 0 1 1 5.689 8.684l.003-.003z" />
+      <path d="M247.319 123.27a3.901 3.901 0 0 0-5.327-1.424l-53.125 30.638 56.579-23.674a3.894 3.894 0 0 0 1.87-5.54h.003z" />
+      <path d="M274.122 82.198c-2.247-3.888-7.306-5.09-11.064-2.63L147 155.518l123.87-62.433c4.012-2.023 5.5-7 3.252-10.887z" />
     </svg>
   )
 }
