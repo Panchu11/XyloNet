@@ -58,6 +58,7 @@ To become the premier stablecoin exchange infrastructure on Arc Network, enablin
 | **Real Yield** | USYC integration for Treasury-backed yields |
 | **Enterprise Ready** | Compliance-friendly with opt-in privacy features |
 | **Mobile First** | Fully responsive UI for mobile traders |
+| **Immersive UX** | Revolutionary animations, 3D effects, and glassmorphism |
 
 ---
 
@@ -346,7 +347,7 @@ function previewWithdraw(uint256 shares) external view returns (uint256);
 ### UI Components
 
 | Component | Location | Purpose |
-|-----------|----------|---------|
+|-----------|----------|---------||
 | SwapWidget | `components/swap/` | Token swap interface |
 | BridgeWidget | `components/bridge/` | Cross-chain bridge UI |
 | Header | `components/` | Navigation, wallet connect |
@@ -356,6 +357,10 @@ function previewWithdraw(uint256 shares) external view returns (uint256);
 | Skeleton | `components/ui/` | Loading states |
 | Tooltip | `components/ui/` | Info tooltips for DeFi terms |
 | Confetti | `components/ui/` | Success celebration |
+| **AnimatedBackground** | `components/ui/` | Canvas particle system with aurora effect |
+| **TiltCard** | `components/ui/` | 3D perspective cards with glare |
+| **AnimatedElements** | `components/ui/` | Magnetic buttons, animated numbers |
+| **CommandPalette** | `components/ui/` | Keyboard navigation (Ctrl+K) |
 
 ### Mobile Responsiveness
 
@@ -366,6 +371,49 @@ The entire application is fully mobile-responsive with:
 - **Active state feedback**: Visual feedback on touch (scale animations)
 - **Responsive typography**: Scaled text sizes for different screens
 - **Horizontal scroll**: Filter pills with horizontal scroll on mobile
+
+### Revolutionary UI/UX Features
+
+XyloNet implements cutting-edge visual effects that create an immersive, premium experience:
+
+#### AnimatedBackground
+- **Canvas-based particle system** with 120+ particles
+- **Aurora borealis effect** using radial gradients
+- **Connection lines** between nearby particles
+- **Mouse interaction** - particles attracted to cursor
+- **GPU-accelerated** with requestAnimationFrame
+
+#### TiltCard
+- **3D perspective transforms** with customizable tilt (0-20°)
+- **Dynamic glare effect** that follows mouse movement
+- **Holographic shine** on hover
+- **Floating animation** for emphasis
+
+#### AnimatedElements
+| Component | Effect |
+|-----------|--------|
+| AnimatedNumber | Counting animations with easing |
+| MagneticButton | Buttons attracted to cursor |
+| GlowButton | Pulse glow effects on hover |
+| RippleButton | Material Design ripple effects |
+| FloatingElement | Continuous floating animation |
+| ParallaxLayer | Mouse-following parallax |
+
+#### CommandPalette (Ctrl+K)
+- **Keyboard-accessible** command palette
+- **Fuzzy search** across all pages
+- **Actions**: Navigate, Connect Wallet, Toggle Theme
+- **Arrow key navigation** with instant execution
+
+#### Advanced CSS Effects
+| Effect | Description |
+|--------|-------------|
+| Glassmorphism 2.0 | Multi-layer blur with saturation boost |
+| Holographic Shine | Animated gradient overlay |
+| Depth Shadow | Layered shadows for 3D appearance |
+| Stagger Fade | Sequential fade-in for list items |
+| Gradient Text | Animated color cycling |
+| Reduced Motion | Accessibility support for users who prefer minimal motion |
 
 ---
 
