@@ -13,6 +13,7 @@ import { SkeletonPoolCard } from '@/components/ui/Skeleton'
 import { InfoTooltip } from '@/components/ui/Tooltip'
 import { Confetti } from '@/components/ui/Confetti'
 import { Sparkline } from '@/components/ui/EmptyState'
+import { TiltCard } from '@/components/ui/TiltCard'
 
 // Pool addresses from deployment
 const POOL_ADDRESSES = {
@@ -348,56 +349,72 @@ export default function PoolsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <Droplets className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
-                <span className="hidden sm:inline">Total Value Locked</span>
-                <span className="sm:hidden">TVL</span>
-                <InfoTooltip term="TVL" />
-              </span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12 stagger-fade">
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center depth-shadow">
+                  <Droplets className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
+                  <span className="hidden sm:inline">Total Value Locked</span>
+                  <span className="sm:hidden">TVL</span>
+                  <InfoTooltip term="TVL" />
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">{formatUSD(totalTVL)}</div>
+              <Sparkline data={volumeData} height={24} className="mt-2 sm:mt-3 hidden sm:block" />
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL)}</div>
-            <Sparkline data={volumeData} height={24} className="mt-2 sm:mt-3 hidden sm:block" />
-          </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--secondary)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
-                <span className="hidden sm:inline">24h Volume (Est.)</span>
-                <span className="sm:hidden">24h Vol</span>
-              </span>
+          </TiltCard>
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center depth-shadow">
+                  <BarChart3 className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                  <span className="hidden sm:inline">24h Volume (Est.)</span>
+                  <span className="sm:hidden">24h Vol</span>
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">{formatUSD(totalTVL * 0.05)}</div>
+              <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-0.5 sm:mt-1">~5% daily turnover</div>
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(totalTVL * 0.05)}</div>
-            <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-0.5 sm:mt-1">~5% daily turnover</div>
-          </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
-                <span className="hidden sm:inline">Your LP Positions</span>
-                <span className="sm:hidden">Positions</span>
-              </span>
+          </TiltCard>
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center depth-shadow">
+                  <TrendingUp className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                  <span className="hidden sm:inline">Your LP Positions</span>
+                  <span className="sm:hidden">Positions</span>
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                {pools.filter(p => p.userLpBalance > ZERO).length}
+              </div>
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              {pools.filter(p => p.userLpBalance > ZERO).length}
+          </TiltCard>
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center depth-shadow">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base">
+                  <span className="hidden sm:inline">Active Pools</span>
+                  <span className="sm:hidden">Pools</span>
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{pools.length}</div>
             </div>
-          </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base">
-                <span className="hidden sm:inline">Active Pools</span>
-                <span className="sm:hidden">Pools</span>
-              </span>
-            </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{pools.length}</div>
-          </div>
+          </TiltCard>
         </div>
 
         {/* Pools List */}
-        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] overflow-hidden">
+        <div className="glass-premium rounded-xl overflow-hidden holographic">
           <div className="px-6 py-4 border-b border-[var(--card-border)]">
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">All Pools</h2>
           </div>
@@ -522,27 +539,32 @@ export default function PoolsPage() {
         </div>
 
         {/* Add Liquidity Info */}
-        <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl border border-green-500/20">
-          <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Earn Fees as a Liquidity Provider</h3>
-          <p className="text-gray-400 text-sm sm:text-base mb-4">
-            When you add liquidity, you receive LP tokens representing your share of the pool. 
-            Earn 0.04% of all trades proportional to your share. StableSwap curve ensures minimal impermanent loss for stablecoin pairs.
-          </p>
-          <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-400" />
-              <span className="text-gray-300">0.04% swap fee</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-blue-400" />
-              <span className="text-gray-300">StableSwap curve</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-400" />
-              <span className="text-gray-300">Minimal IL for stable pairs</span>
+        <TiltCard tiltAmount={4} glareEnabled={true}>
+          <div className="mt-6 sm:mt-8 p-4 sm:p-6 glass-premium rounded-xl holographic">
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-2 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-emerald-400" />
+              Earn Fees as a Liquidity Provider
+            </h3>
+            <p className="text-gray-400 text-sm sm:text-base mb-4">
+              When you add liquidity, you receive LP tokens representing your share of the pool. 
+              Earn 0.04% of all trades proportional to your share. StableSwap curve ensures minimal impermanent loss for stablecoin pairs.
+            </p>
+            <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-green-300">0.04% swap fee</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <span className="text-blue-300">StableSwap curve</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30">
+                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                <span className="text-purple-300">Minimal IL for stable pairs</span>
+              </div>
             </div>
           </div>
-        </div>
+        </TiltCard>
       </div>
 
       {/* Add Liquidity Modal */}

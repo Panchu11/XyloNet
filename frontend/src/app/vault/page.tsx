@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi'
 import { parseUnits, formatUnits } from 'viem'
-import { TrendingUp, Shield, Clock, ChevronRight, Loader2, AlertCircle, Sparkles } from 'lucide-react'
+import { TrendingUp, Shield, Clock, ChevronRight, Loader2, AlertCircle, Sparkles, Coins } from 'lucide-react'
 import { TOKENS, CONTRACTS } from '@/config/constants'
 import { XYLO_VAULT_ABI, ERC20_ABI } from '@/config/abis'
 import { cn, formatNumber, formatUSD } from '@/lib/utils'
@@ -13,6 +13,7 @@ import { SkeletonVaultCard } from '@/components/ui/Skeleton'
 import { InfoTooltip } from '@/components/ui/Tooltip'
 import { Confetti } from '@/components/ui/Confetti'
 import { Sparkline } from '@/components/ui/EmptyState'
+import { TiltCard } from '@/components/ui/TiltCard'
 
 const ZERO = BigInt(0)
 
@@ -226,41 +227,54 @@ export default function VaultPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12">
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--primary)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
-                <span className="hidden sm:inline">Total Value Locked</span>
-                <span className="sm:hidden">TVL</span>
-                <InfoTooltip term="TVL" />
-              </span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12 stagger-fade">
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full holographic">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center depth-shadow">
+                  <Shield className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
+                  <span className="hidden sm:inline">Total Value Locked</span>
+                  <span className="sm:hidden">TVL</span>
+                  <InfoTooltip term="TVL" />
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">{formatUSD(tvl)}</div>
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(tvl)}</div>
-          </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--success)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
-                Current APY
-                <InfoTooltip term="APY" />
-              </span>
+          </TiltCard>
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full holographic">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center depth-shadow animate-pulse">
+                  <TrendingUp className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base flex items-center gap-1">
+                  Current APY
+                  <InfoTooltip term="APY" />
+                </span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">{apyFormatted}%</div>
+              <Sparkline data={apyHistory} height={24} className="mt-2 sm:mt-3 hidden sm:block" color="linear-gradient(to top, #00c9a7, #00e6b8)" />
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--success)]">{apyFormatted}%</div>
-            <Sparkline data={apyHistory} height={24} className="mt-2 sm:mt-3 hidden sm:block" color="linear-gradient(to top, #00c9a7, #00e6b8)" />
-          </div>
-          <div className="bg-[var(--card-bg)] rounded-xl p-4 sm:p-6 border border-[var(--card-border)] card-lift">
-            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--secondary)]" />
-              <span className="text-[var(--text-secondary)] text-xs sm:text-base">Your Position</span>
+          </TiltCard>
+          <TiltCard tiltAmount={6}>
+            <div className="glass-premium rounded-xl p-4 sm:p-6 h-full holographic">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center depth-shadow">
+                  <Coins className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-[var(--text-secondary)] text-xs sm:text-base">Your Position</span>
+              </div>
+              <div className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{formatUSD(userAssetsValue)}</div>
             </div>
-            <div className="text-xl sm:text-3xl font-bold text-[var(--text-primary)]">{formatUSD(userAssetsValue)}</div>
-          </div>
+          </TiltCard>
         </div>
 
         {/* Vault Card */}
-        <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--card-border)] overflow-hidden">
-          <div className="p-4 sm:p-6">
+        <TiltCard tiltAmount={4} glareEnabled={true}>
+          <div className="glass-premium rounded-xl overflow-hidden holographic">
+            <div className="p-4 sm:p-6">
             <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-[var(--primary)] flex items-center justify-center overflow-hidden flex-shrink-0">
                 <TokenLogo symbol="USDC" size={36} className="sm:w-12 sm:h-12" />
@@ -293,46 +307,53 @@ export default function VaultPage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => setShowDeposit(true)}
-                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98]"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2 min-h-[48px] active:scale-[0.98] magnetic-hover depth-shadow"
               >
+                <Sparkles className="w-4 h-4" />
                 Deposit USDC
               </button>
               {(userShares as bigint) > ZERO && (
                 <button
                   onClick={() => setShowWithdraw(true)}
-                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-all min-h-[48px] active:scale-[0.98]"
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-all min-h-[48px] active:scale-[0.98] magnetic-hover"
                 >
                   Withdraw
                 </button>
               )}
             </div>
+            </div>
           </div>
-        </div>
+        </TiltCard>
 
         {/* USYC Info */}
-        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl border border-blue-500/20">
-          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl sm:text-2xl">💎</span>
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2">About Arc Vaults</h3>
-              <p className="text-gray-400 text-sm sm:text-base mb-3 sm:mb-4">
-                XyloNet vaults leverage Arc Network&apos;s unique features including sub-second finality 
-                and native USDC gas to optimize yield strategies. Deposits are managed by the vault contract.
-              </p>
-              <a
-                href={`https://testnet.arcscan.app/address/${CONTRACTS.VAULT}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm sm:text-base"
-              >
-                View Vault Contract
-                <ChevronRight className="w-4 h-4" />
-              </a>
+        <TiltCard tiltAmount={4} glareEnabled={true}>
+          <div className="mt-8 sm:mt-12 p-4 sm:p-6 glass-premium rounded-xl holographic">
+            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center flex-shrink-0 depth-shadow">
+                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-1 sm:mb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-400" />
+                  About Arc Vaults
+                </h3>
+                <p className="text-gray-400 text-sm sm:text-base mb-3 sm:mb-4">
+                  XyloNet vaults leverage Arc Network&apos;s unique features including sub-second finality 
+                  and native USDC gas to optimize yield strategies. Deposits are managed by the vault contract.
+                </p>
+                <a
+                  href={`https://testnet.arcscan.app/address/${CONTRACTS.VAULT}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm sm:text-base group"
+                >
+                  View Vault Contract
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        </TiltCard>
       </div>
 
       {/* Deposit Modal */}

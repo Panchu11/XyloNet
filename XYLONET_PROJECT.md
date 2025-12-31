@@ -693,7 +693,7 @@ XyloNet directly addresses the [Arc Builders Fund](https://www.circle.com/blog/i
 
 ## Future Roadmap
 
-### Phase 4: Advanced Features (Q2 2025)
+### Phase 4: Advanced Features (Planned)
 
 | Feature | Description | Status |
 |---------|-------------|--------|
@@ -702,7 +702,7 @@ XyloNet directly addresses the [Arc Builders Fund](https://www.circle.com/blog/i
 | AI Agent Interface | MCP tools for automated trading | Planned |
 | Limit Orders | Time-weighted average price orders | Planned |
 
-### Phase 5: Governance & Token (Q3 2025)
+### Phase 5: Governance & Token (Planned)
 
 | Feature | Description | Status |
 |---------|-------------|--------|
@@ -711,7 +711,7 @@ XyloNet directly addresses the [Arc Builders Fund](https://www.circle.com/blog/i
 | DAO Governance | On-chain proposal system | Planned |
 | Fee Distribution | Protocol fees to stakers | Planned |
 
-### Phase 6: Mainnet Launch (Q4 2025)
+### Phase 6: Mainnet Launch (Planned)
 
 | Milestone | Description | Status |
 |-----------|-------------|--------|
