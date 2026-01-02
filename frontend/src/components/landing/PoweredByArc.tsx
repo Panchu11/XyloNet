@@ -94,12 +94,8 @@ export default function PoweredByArc() {
                   
                   {/* Arc logo representation */}
                   <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                      <svg viewBox="0 0 40 40" className="w-10 h-10 text-white">
-                        <circle cx="20" cy="20" r="15" stroke="currentColor" strokeWidth="3" fill="none"/>
-                        <path d="M12 20a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                        <circle cx="20" cy="20" r="4" fill="currentColor"/>
-                      </svg>
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                      <img src="/chains/arc.svg" alt="Arc Network" className="w-12 h-12 object-contain" />
                     </div>
                     <div>
                       <h3 className="text-4xl md:text-5xl font-bold text-white">Arc Network</h3>

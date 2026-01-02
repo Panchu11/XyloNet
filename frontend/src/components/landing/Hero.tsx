@@ -109,7 +109,7 @@ export default function Hero() {
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-xl blur opacity-40 animate-pulse" />
             </div>
             <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
-              XYLONET
+              XyloNet
             </span>
           </div>
         </div>
@@ -162,30 +162,7 @@ export default function Hero() {
           </span>
         </div>
 
-        {/* Stats */}
-        <div 
-          className={`grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-        >
-          {[
-            { label: 'Total Value Locked', value: 1234567, prefix: '$', suffix: '' },
-            { label: '24h Volume', value: 456789, prefix: '$', suffix: '' },
-            { label: 'Transactions', value: 12500, prefix: '', suffix: '' },
-            { label: 'Connected Chains', value: 7, prefix: '', suffix: '+' },
-          ].map((stat, index) => (
-            <div 
-              key={stat.label}
-              className="relative group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 hover:border-white/20 transition-all duration-300">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">
-                  {stat.prefix}<AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+
 
         {/* Scroll indicator */}
         <div className={`mt-16 transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>

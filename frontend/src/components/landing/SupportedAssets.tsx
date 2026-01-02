@@ -30,7 +30,7 @@ const chains = [
   { name: 'Optimism', icon: '/chains/optimism.svg', color: '#FF0420' },
   { name: 'Polygon', icon: '/chains/polygon.svg', color: '#8247E5' },
   { name: 'Avalanche', icon: '/chains/avalanche.svg', color: '#E84142' },
-  { name: 'Arc', icon: '/logo.png', color: '#3B82F6' }, // Using XyloNet logo as placeholder since we don't have Arc logo
+  { name: 'Arc', icon: '/chains/arc.svg', color: '#00C2FF' }, // Official Arc Network logo
 ];
 
 function TokenCard({ token, index }: { token: typeof tokens[0]; index: number }) {
