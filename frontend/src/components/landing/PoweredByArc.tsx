@@ -93,7 +93,7 @@ export default function PoweredByArc() {
                   </div>
                   
                   {/* Arc logo representation */}
-                  <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
+                  <a href="https://www.arc.network/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center lg:justify-start gap-4 mb-6">
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                       <img src="/chains/arc.png" alt="Arc Network" className="w-12 h-12 object-contain" />
                     </div>
@@ -101,7 +101,7 @@ export default function PoweredByArc() {
                       <h3 className="text-4xl md:text-5xl font-bold text-white">Arc Network</h3>
                       <p className="text-gray-400">By Circle</p>
                     </div>
-                  </div>
+                  </a>
                   
                   <p className="text-gray-400 text-lg mb-8 max-w-lg">
                     Arc is Circle&apos;s Layer 1 blockchain purpose-built for stablecoin applications. 
@@ -109,7 +109,7 @@ export default function PoweredByArc() {
                   </p>
                   
                   <a
-                    href="https://www.circle.com/arc"
+                    href="https://www.arc.network/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 border border-white/20 rounded-xl font-medium text-white hover:bg-white/20 transition-all duration-300"

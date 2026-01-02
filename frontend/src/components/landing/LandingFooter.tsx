@@ -138,14 +138,11 @@ export default function LandingFooter() {
           </p>
           <p className="text-sm text-gray-500">
             Built by{' '}
-            <a 
-              href="https://x.com/ForgeLabs_" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition-colors duration-200"
+            <span 
+              className="text-gray-400"
             >
               ForgeLabs
-            </a>
+            </span>
           </p>
         </div>
       </div>
