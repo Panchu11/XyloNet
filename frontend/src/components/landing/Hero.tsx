@@ -118,11 +118,12 @@ export default function Hero() {
         <h1 
           className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
         >
-          <span className="block bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white animate-gradient-x">
+          <span className="block text-white animate-gradient-x">
             The Stablecoin
           </span>
-          <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 animate-gradient-x animation-delay-500">
-            SuperExchange
+          <span className="block relative">
+            <span className="block absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 -z-10"></span>
+            <span className="block text-white relative font-bold">SuperExchange</span>
           </span>
         </h1>
 
