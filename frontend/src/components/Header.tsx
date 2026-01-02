@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { XyloNetLogoFallback } from './ui/TokenLogos'
 
 const navLinks = [
-  { href: '/', label: 'Swap' },
+  { href: '/swap', label: 'Swap' },
   { href: '/pools', label: 'Pools' },
   { href: '/bridge', label: 'Bridge' },
   { href: '/vault', label: 'Vault' },
@@ -51,6 +51,13 @@ export function Header() {
             XyloNet
           </span>
         </Link>
+        
+        {/* Home Link - only show on app pages */}
+        {pathname !== '/' && pathname !== '/swap' && (
+          <Link href="/" className="ml-4 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+            ← Home
+          </Link>
+        )}
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1">
