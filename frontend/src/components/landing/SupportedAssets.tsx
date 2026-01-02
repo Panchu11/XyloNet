@@ -30,7 +30,7 @@ const chains = [
   { name: 'Optimism', icon: '/chains/optimism.svg', color: '#FF0420' },
   { name: 'Polygon', icon: '/chains/polygon.svg', color: '#8247E5' },
   { name: 'Avalanche', icon: '/chains/avalanche.svg', color: '#E84142' },
-  { name: 'Arc', icon: '/chains/arc.svg', color: '#00C2FF' }, // Official Arc Network logo
+  { name: 'Arc', icon: '/chains/arc.png', color: '#00C2FF' }, // Official Arc Network logo
 ];
 
 function TokenCard({ token, index }: { token: typeof tokens[0]; index: number }) {

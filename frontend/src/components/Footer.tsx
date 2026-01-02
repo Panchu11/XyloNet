@@ -37,9 +37,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
           {/* Credits */}
           <div className="flex items-center gap-2 text-xs sm:text-sm text-[var(--text-secondary)] order-2 sm:order-1">
-            <span>Built with</span>
-            <span className="text-red-500">♥</span>
-            <span>by</span>
+            <span>Built by</span>
             <span className="font-semibold text-[var(--text-primary)]">
               ForgeLabs
             </span>

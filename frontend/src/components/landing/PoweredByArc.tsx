@@ -95,7 +95,7 @@ export default function PoweredByArc() {
                   {/* Arc logo representation */}
                   <div className="flex items-center justify-center lg:justify-start gap-4 mb-6">
                     <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                      <img src="/chains/arc.svg" alt="Arc Network" className="w-12 h-12 object-contain" />
+                      <img src="/chains/arc.png" alt="Arc Network" className="w-12 h-12 object-contain" />
                     </div>
                     <div>
                       <h3 className="text-4xl md:text-5xl font-bold text-white">Arc Network</h3>

@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
 import { CommandPalette } from "@/components/ui/CommandPalette";
+import ConditionalFooter from "@/components/ConditionalFooter";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,7 +53,7 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
-          <Footer />
+          <ConditionalFooter />
           <Analytics />
           <SpeedInsights />
         </Providers>
