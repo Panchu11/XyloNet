@@ -121,7 +121,7 @@ export default function Hero() {
           <span className="block text-white animate-gradient-x">
             The Stablecoin
           </span>
-          <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 text-transparent bg-clip-text animate-gradient-x animation-delay-500">
+          <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 text-transparent bg-clip-text animate-gradient-x animation-delay-500" style={{ lineHeight: '1.2', transform: 'translateZ(0)' }}>
             SuperExchange
           </span>
         </h1>
