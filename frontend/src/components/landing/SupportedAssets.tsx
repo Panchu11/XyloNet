@@ -7,30 +7,30 @@ const tokens = [
     name: 'USDC',
     fullName: 'USD Coin',
     color: '#2775CA',
-    icon: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
+    icon: '/tokens/usdc.png',
   },
   {
     name: 'EURC',
     fullName: 'Euro Coin',
-    color: '#2775CA',
-    icon: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
+    color: '#5D7CBA',
+    icon: '/tokens/eurc.png',
   },
   {
     name: 'USYC',
     fullName: 'US Yield Coin',
     color: '#10B981',
-    icon: null,
+    icon: '/tokens/usyc.png',
   },
 ];
 
 const chains = [
-  { name: 'Ethereum', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg', color: '#627EEA' },
-  { name: 'Arbitrum', icon: 'https://cryptologos.cc/logos/arbitrum-arb-logo.svg', color: '#28A0F0' },
-  { name: 'Base', icon: 'https://raw.githubusercontent.com/base-org/brand-kit/main/logo/in-product/Base_Network_Logo.svg', color: '#0052FF' },
-  { name: 'Optimism', icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg', color: '#FF0420' },
-  { name: 'Polygon', icon: 'https://cryptologos.cc/logos/polygon-matic-logo.svg', color: '#8247E5' },
-  { name: 'Avalanche', icon: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg', color: '#E84142' },
-  { name: 'Arc', icon: null, color: '#3B82F6' },
+  { name: 'Ethereum', icon: '/chains/ethereum.svg', color: '#627EEA' },
+  { name: 'Arbitrum', icon: '/chains/arbitrum.svg', color: '#28A0F0' },
+  { name: 'Base', icon: '/chains/base.jpg', color: '#0052FF' },
+  { name: 'Optimism', icon: '/chains/optimism.svg', color: '#FF0420' },
+  { name: 'Polygon', icon: '/chains/polygon.svg', color: '#8247E5' },
+  { name: 'Avalanche', icon: '/chains/avalanche.svg', color: '#E84142' },
+  { name: 'Arc', icon: '/logo.png', color: '#3B82F6' }, // Using XyloNet logo as placeholder since we don't have Arc logo
 ];
 
 function TokenCard({ token, index }: { token: typeof tokens[0]; index: number }) {
@@ -52,7 +52,7 @@ function TokenCard({ token, index }: { token: typeof tokens[0]; index: number })
           style={{ backgroundColor: `${token.color}20` }}
         >
           {token.icon ? (
-            <img src={token.icon} alt={token.name} className="w-10 h-10" />
+            <img src={token.icon} alt={token.name} className="w-10 h-10 object-contain" />
           ) : (
             <span className="text-2xl font-bold" style={{ color: token.color }}>{token.name.slice(0, 2)}</span>
           )}
@@ -83,7 +83,7 @@ function ChainBadge({ chain, index }: { chain: typeof chains[0]; index: number }
           style={{ backgroundColor: `${chain.color}20` }}
         >
           {chain.icon ? (
-            <img src={chain.icon} alt={chain.name} className="w-5 h-5" />
+            <img src={chain.icon} alt={chain.name} className="w-5 h-5 object-contain" />
           ) : (
             <span className="text-sm font-bold" style={{ color: chain.color }}>A</span>
           )}
