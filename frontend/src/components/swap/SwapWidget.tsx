@@ -458,7 +458,7 @@ export function SwapWidget({ className }: SwapWidgetProps) {
               </button>
             </div>
             <div className="space-y-1 sm:space-y-2">
-              {(Object.keys(TOKENS) as TokenKey[]).map((key) => {
+              {(Object.keys(TOKENS) as TokenKey[]).filter((key) => key !== 'USYC').map((key) => {
                 const token = TOKENS[key]
                 return (
                   <button
