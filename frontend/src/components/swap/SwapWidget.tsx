@@ -35,6 +35,8 @@ export function SwapWidget({ className }: SwapWidgetProps) {
   const [needsApproval, setNeedsApproval] = useState(false)
   const [swapRotation, setSwapRotation] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [lastProcessedSwapHash, setLastProcessedSwapHash] = useState<string | null>(null)
+  const [lastProcessedApproveHash, setLastProcessedApproveHash] = useState<string | null>(null)
 
   // Contract write hooks
   const { writeContract: writeApprove, data: approveHash, isPending: isApproving } = useWriteContract()
@@ -93,18 +95,22 @@ export function SwapWidget({ className }: SwapWidgetProps) {
 
   // Refetch allowance after approval
   useEffect(() => {
-    if (isApproveConfirmed) {
+    if (isApproveConfirmed && approveHash && approveHash !== lastProcessedApproveHash) {
+      setLastProcessedApproveHash(approveHash)
       refetchAllowance()
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Approval Successful!', approveHash)
         toastIdRef.current = null
       }
     }
-  }, [isApproveConfirmed, refetchAllowance, success, approveHash])
+  }, [isApproveConfirmed, approveHash, lastProcessedApproveHash, refetchAllowance, success])
 
   // Handle swap success
   useEffect(() => {
-    if (isSwapConfirmed && swapHash) {
+    // Only process each swap hash once
+    if (isSwapConfirmed && swapHash && swapHash !== lastProcessedSwapHash) {
+      setLastProcessedSwapHash(swapHash)
+      
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Swap Successful!', swapHash)
         toastIdRef.current = null
@@ -123,11 +129,12 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         amountOut: amountOut,
         status: 'success',
       })
+      // Reset input fields
       setAmountIn('')
       setAmountOut('')
       setErrorMsg(null)
     }
-  }, [isSwapConfirmed, swapHash, success, tokenIn, tokenOut, amountIn, amountOut])
+  }, [isSwapConfirmed, swapHash, lastProcessedSwapHash, success, tokenIn, tokenOut, amountIn, amountOut])
 
   // Handle errors
   useEffect(() => {
