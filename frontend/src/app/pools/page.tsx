@@ -459,12 +459,19 @@ export default function PoolsPage() {
                   <div className="flex gap-2 md:hidden">
                     <button
                       onClick={() => {
+                        if (pool.id === 'USDC-USYC') return
                         setSelectedPool(pool)
                         setShowAddLiquidity(true)
                       }}
-                      className="px-3 py-1.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-lg text-xs font-medium transition-colors min-h-[36px]"
+                      disabled={pool.id === 'USDC-USYC'}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors min-h-[36px]",
+                        pool.id === 'USDC-USYC'
+                          ? "bg-gray-500/10 text-gray-500 cursor-not-allowed"
+                          : "bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400"
+                      )}
                     >
-                      Add
+                      {pool.id === 'USDC-USYC' ? 'Coming Soon' : 'Add'}
                     </button>
                     {pool.userLpBalance > ZERO && (
                       <button
@@ -514,12 +521,19 @@ export default function PoolsPage() {
                 <div className="hidden md:flex justify-end gap-2">
                   <button
                     onClick={() => {
+                      if (pool.id === 'USDC-USYC') return
                       setSelectedPool(pool)
                       setShowAddLiquidity(true)
                     }}
-                    className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-lg text-sm font-medium transition-colors"
+                    disabled={pool.id === 'USDC-USYC'}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      pool.id === 'USDC-USYC'
+                        ? "bg-gray-500/10 text-gray-500 cursor-not-allowed"
+                        : "bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400"
+                    )}
                   >
-                    Add
+                    {pool.id === 'USDC-USYC' ? 'Coming Soon' : 'Add'}
                   </button>
                   {pool.userLpBalance > ZERO && (
                     <button
