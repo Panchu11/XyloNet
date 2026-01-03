@@ -28,6 +28,21 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get('wallet');
+    const countOnly = searchParams.get('count');
+    
+    // Return total user count if requested
+    if (countOnly === 'true') {
+      const { count, error } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true });
+      
+      if (error) {
+        console.error('Error counting users:', error);
+        return Response.json({ count: 0 });
+      }
+      
+      return Response.json({ count: count || 0 });
+    }
     
     if (!walletAddress) {
       return Response.json({ error: 'Wallet address is required' }, { status: 400 });

@@ -2,6 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useReadContracts } from 'wagmi';
+import { CONTRACTS } from '@/config/constants';
+import { XYLO_POOL_ABI, XYLO_VAULT_ABI } from '@/config/abis';
+import { formatUnits } from 'viem';
 
 // Animated number counter with formatting
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
@@ -63,9 +67,77 @@ function FloatingParticle({ delay, size, left, duration }: { delay: number; size
   );
 }
 
+// Hook to fetch real protocol stats
+function useProtocolStats() {
+  const [totalUsers, setTotalUsers] = useState(0);
+
+  // Fetch on-chain data from pools and vault
+  const { data: contractData } = useReadContracts({
+    contracts: [
+      // USDC-EURC Pool reserves
+      {
+        address: CONTRACTS.USDC_EURC_POOL,
+        abi: XYLO_POOL_ABI,
+        functionName: 'getReserves',
+      },
+      // USDC-USYC Pool reserves
+      {
+        address: CONTRACTS.USDC_USYC_POOL,
+        abi: XYLO_POOL_ABI,
+        functionName: 'getReserves',
+      },
+      // Vault total assets
+      {
+        address: CONTRACTS.VAULT,
+        abi: XYLO_VAULT_ABI,
+        functionName: 'totalAssets',
+      },
+    ],
+  });
+
+  // Fetch user count from Supabase
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/api/users?count=true');
+        const data = await res.json();
+        setTotalUsers(data.count || 0);
+      } catch (e) {
+        console.error('Failed to fetch user count:', e);
+      }
+    }
+    fetchUsers();
+  }, []);
+
+  // Calculate TVL from contract data
+  let tvl = 0;
+  if (contractData) {
+    // Pool 1 reserves (USDC-EURC)
+    if (contractData[0]?.result) {
+      const [reserve0, reserve1] = contractData[0].result as [bigint, bigint];
+      tvl += Number(formatUnits(reserve0, 6)) + Number(formatUnits(reserve1, 6));
+    }
+    // Pool 2 reserves (USDC-USYC)
+    if (contractData[1]?.result) {
+      const [reserve0, reserve1] = contractData[1].result as [bigint, bigint];
+      tvl += Number(formatUnits(reserve0, 6)) + Number(formatUnits(reserve1, 6));
+    }
+    // Vault total assets
+    if (contractData[2]?.result) {
+      tvl += Number(formatUnits(contractData[2].result as bigint, 6));
+    }
+  }
+
+  return {
+    tvl: Math.round(tvl),
+    totalUsers,
+  };
+}
+
 export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const { tvl, totalUsers } = useProtocolStats();
 
   useEffect(() => {
     setIsVisible(true);
@@ -229,25 +301,28 @@ export default function Hero() {
           </Link>
         </div>
 
-        {/* Live stats */}
+        {/* Live stats - Real on-chain data */}
         <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {[
-            { label: 'Total Value Locked', value: 125000, prefix: '$', suffix: '' },
-            { label: 'Total Swaps', value: 8420, prefix: '', suffix: '' },
-            { label: 'Unique Users', value: 1250, prefix: '', suffix: '+' },
-            { label: 'Avg. Gas Cost', value: 0.01, prefix: '~$', suffix: '' },
-          ].map((stat, index) => (
+            { label: 'Total Value Locked', value: tvl, prefix: '$', suffix: '', isLive: true },
+            { label: 'Supported Chains', value: 7, prefix: '', suffix: '+', isLive: false },
+            { label: 'Unique Users', value: totalUsers, prefix: '', suffix: '', isLive: true },
+            { label: 'Avg. Gas Cost', value: 0.01, prefix: '~$', suffix: '', isLive: false },
+          ].map((stat) => (
             <div 
               key={stat.label}
               className="relative group"
             >
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 md:p-6 hover:border-white/20 transition-all duration-300">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1 flex items-center justify-center gap-2">
                   {stat.value < 1 ? (
                     <span>{stat.prefix}{stat.value}{stat.suffix}</span>
                   ) : (
                     <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+                  )}
+                  {stat.isLive && (
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" title="Live data" />
                   )}
                 </div>
                 <div className="text-xs md:text-sm text-gray-400">{stat.label}</div>
