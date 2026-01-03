@@ -195,7 +195,7 @@ export default function LandingFooter() {
               <span className="text-xs text-gray-600">for</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
                 <img src="/chains/arc.png" alt="Arc" className="w-3.5 h-3.5" />
-                <span className="text-xs text-blue-400 font-medium">Arc Builders Fund</span>
+                <span className="text-xs text-blue-400 font-medium">Arc</span>
               </div>
             </div>
           </div>
