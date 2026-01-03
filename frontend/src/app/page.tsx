@@ -1,7 +1,26 @@
 'use client';
 
-import { Hero, Features, Campaign, SupportedAssets, PoweredByArc, LandingFooter } from '@/components/landing';
+import dynamic from 'next/dynamic';
+import { Hero, Features } from '@/components/landing';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
+
+// Performance: Lazy load below-the-fold components
+const Campaign = dynamic(() => import('@/components/landing').then(mod => ({ default: mod.Campaign })), {
+  loading: () => <div className="min-h-screen" />,
+  ssr: false, // Campaign needs wallet connection - client only
+});
+
+const SupportedAssets = dynamic(() => import('@/components/landing').then(mod => ({ default: mod.SupportedAssets })), {
+  loading: () => <div className="min-h-[400px]" />,
+});
+
+const PoweredByArc = dynamic(() => import('@/components/landing').then(mod => ({ default: mod.PoweredByArc })), {
+  loading: () => <div className="min-h-[400px]" />,
+});
+
+const LandingFooter = dynamic(() => import('@/components/landing').then(mod => ({ default: mod.LandingFooter })), {
+  loading: () => <div className="min-h-[300px]" />,
+});
 
 export default function LandingPage() {
   return (
