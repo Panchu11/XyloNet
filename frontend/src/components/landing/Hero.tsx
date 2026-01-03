@@ -253,8 +253,8 @@ export default function Hero() {
               <span className="relative z-10 bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 text-transparent bg-clip-text leading-[1.1]">
                 SuperExchange
               </span>
-              {/* Animated underline */}
-              <span className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 rounded-full transform origin-left animate-expand" />
+              {/* Animated underline - positioned below descender letters */}
+              <span className="absolute -bottom-4 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 rounded-full transform origin-left animate-expand" />
             </span>
           </h1>
         </div>
