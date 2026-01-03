@@ -157,13 +157,36 @@ export function BridgeWidget() {
 
     } catch (err: any) {
       console.error('Bridge error:', err)
-      setErrorMsg(err.message || 'Bridge failed. Please try again.')
-      errorToast(toastId, 'Bridge Failed', err.message || 'Transaction failed')
       
-      // Mark current step as error
-      setSteps(prev => prev.map(step => 
-        step.state === 'in_progress' ? { ...step, state: 'error' } : step
-      ))
+      // Check if this is an RPC parsing error (bridge may have succeeded)
+      const isRpcError = err.message?.includes('JSON') || 
+                        err.message?.includes('HTTP request failed') ||
+                        err.message?.includes('Unterminated string')
+      
+      // Check which steps completed successfully
+      const burnCompleted = steps.some(s => s.name === 'burn' && s.state === 'success')
+      const attestationCompleted = steps.some(s => s.name === 'fetchAttestation' && s.state === 'success')
+      
+      if (isRpcError && (burnCompleted || attestationCompleted)) {
+        // Bridge likely succeeded, just RPC verification failed
+        const warningMsg = 'Bridge transaction submitted successfully! The mint may take 30-60 seconds. Check your destination wallet or explorer to confirm receipt.'
+        setErrorMsg(warningMsg)
+        success(toastId, 'Bridge Submitted!', steps.find(s => s.txHash)?.txHash || '')
+        
+        // Mark mint as pending (not error)
+        setSteps(prev => prev.map(step => 
+          step.name === 'mint' ? { ...step, state: 'pending' } : step
+        ))
+      } else {
+        // Actual bridge failure
+        setErrorMsg(err.message || 'Bridge failed. Please try again.')
+        errorToast(toastId, 'Bridge Failed', err.message || 'Transaction failed')
+        
+        // Mark current step as error
+        setSteps(prev => prev.map(step => 
+          step.state === 'in_progress' ? { ...step, state: 'error' } : step
+        ))
+      }
     } finally {
       setIsBridging(false)
       setCurrentStep('')
@@ -221,13 +244,26 @@ export function BridgeWidget() {
           </div>
         )}
 
-        {/* Error State */}
+        {/* Error/Warning State */}
         {errorMsg && (
-          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <div className={cn(
+            "mb-4 p-4 border rounded-lg",
+            errorMsg.includes('submitted successfully')
+              ? "bg-yellow-500/10 border-yellow-500/30"
+              : "bg-red-500/10 border-red-500/30"
+          )}>
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-6 h-6 text-red-400" />
+              <AlertCircle className={cn(
+                "w-6 h-6",
+                errorMsg.includes('submitted successfully') ? "text-yellow-400" : "text-red-400"
+              )} />
               <div className="flex-1">
-                <p className="font-medium text-red-400">Bridge Failed</p>
+                <p className={cn(
+                  "font-medium",
+                  errorMsg.includes('submitted successfully') ? "text-yellow-400" : "text-red-400"
+                )}>
+                  {errorMsg.includes('submitted successfully') ? 'Bridge Submitted - Awaiting Confirmation' : 'Bridge Failed'}
+                </p>
                 <p className="text-sm text-[var(--text-secondary)]">{errorMsg}</p>
               </div>
             </div>
