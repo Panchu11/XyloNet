@@ -38,7 +38,7 @@ export function BridgeWidget() {
   const { pending, success, error: errorToast } = useTxToast()
   
   const [sourceChain] = useState<BridgeChain>(BRIDGE_CHAINS[0]) // Arc Testnet as source (fixed)
-  const [destChain, setDestChain] = useState<BridgeChain>(BRIDGE_CHAINS[3]) // Base Sepolia as default
+  const [destChain, setDestChain] = useState<BridgeChain>(BRIDGE_CHAINS[1]) // Ethereum Sepolia as default (only active)
   const [amount, setAmount] = useState('')
   const [showDestSelect, setShowDestSelect] = useState(false)
   const [isBridging, setIsBridging] = useState(false)
@@ -460,27 +460,43 @@ export function BridgeWidget() {
               </button>
             </div>
             <div className="space-y-1 sm:space-y-2">
-              {BRIDGE_CHAINS.filter(c => c.id !== 'Arc_Testnet').map((chain) => (
-                <button
-                  key={chain.id}
-                  onClick={() => {
-                    setDestChain(chain)
-                    setShowDestSelect(false)
-                  }}
-                  className={cn(
-                    'w-full flex items-center gap-3 p-3 rounded-lg transition-colors min-h-[56px]',
-                    destChain.id === chain.id
-                      ? 'bg-[var(--primary)]/20 border border-[var(--primary)]/50'
-                      : 'hover:bg-[var(--card-border)] active:bg-[var(--card-border)]'
-                  )}
-                >
-                  <ChainLogo name={chain.name} size={36} />
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-[var(--text-primary)]">{chain.name}</div>
-                    <div className="text-sm text-[var(--text-secondary)]">Chain ID: {chain.chainId}</div>
-                  </div>
-                </button>
-              ))}
+              {BRIDGE_CHAINS.filter(c => c.id !== 'Arc_Testnet').map((chain) => {
+                const isComingSoon = chain.id !== 'Ethereum_Sepolia'
+                return (
+                  <button
+                    key={chain.id}
+                    onClick={() => {
+                      if (isComingSoon) return
+                      setDestChain(chain)
+                      setShowDestSelect(false)
+                    }}
+                    disabled={isComingSoon}
+                    className={cn(
+                      'w-full flex items-center gap-3 p-3 rounded-lg transition-colors min-h-[56px] relative',
+                      isComingSoon
+                        ? 'opacity-50 cursor-not-allowed bg-gray-500/5'
+                        : destChain.id === chain.id
+                          ? 'bg-[var(--primary)]/20 border border-[var(--primary)]/50'
+                          : 'hover:bg-[var(--card-border)] active:bg-[var(--card-border)]'
+                    )}
+                  >
+                    <ChainLogo name={chain.name} size={36} />
+                    <div className="flex-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-[var(--text-primary)]">{chain.name}</span>
+                        {isComingSoon && (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-full">
+                            COMING SOON
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-[var(--text-secondary)]">
+                        {isComingSoon ? 'Bridge support in development' : `Chain ID: ${chain.chainId}`}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
