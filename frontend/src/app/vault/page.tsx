@@ -14,6 +14,7 @@ import { InfoTooltip } from '@/components/ui/Tooltip'
 import { Confetti } from '@/components/ui/Confetti'
 import { Sparkline } from '@/components/ui/EmptyState'
 import { TiltCard } from '@/components/ui/TiltCard'
+import { saveTransaction } from '@/lib/transactions'
 
 const ZERO = BigInt(0)
 
@@ -128,11 +129,20 @@ export default function VaultPage() {
 
   // Reset and refetch after successful deposit/withdraw
   useEffect(() => {
-    if (isDepositConfirmed) {
+    if (isDepositConfirmed && depositHash) {
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Deposit Successful!', depositHash)
         toastIdRef.current = null
       }
+      // Save to transaction history
+      saveTransaction({
+        hash: depositHash,
+        type: 'deposit',
+        timestamp: Date.now(),
+        tokenIn: 'USDC',
+        amountIn: depositAmount,
+        status: 'success',
+      })
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 100)
       setDepositAmount('')
@@ -141,20 +151,29 @@ export default function VaultPage() {
       refetchTotalAssets()
       refetchUserShares()
     }
-  }, [isDepositConfirmed, depositHash, refetchTotalAssets, refetchUserShares, success])
+  }, [isDepositConfirmed, depositHash, depositAmount, refetchTotalAssets, refetchUserShares, success])
 
   useEffect(() => {
-    if (isWithdrawConfirmed) {
+    if (isWithdrawConfirmed && withdrawHash) {
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Withdraw Successful!', withdrawHash)
         toastIdRef.current = null
       }
+      // Save to transaction history
+      saveTransaction({
+        hash: withdrawHash,
+        type: 'withdraw',
+        timestamp: Date.now(),
+        tokenOut: 'USDC',
+        amountOut: withdrawAmount,
+        status: 'success',
+      })
       setWithdrawAmount('')
       setShowWithdraw(false)
       refetchTotalAssets()
       refetchUserShares()
     }
-  }, [isWithdrawConfirmed, withdrawHash, refetchTotalAssets, refetchUserShares, success])
+  }, [isWithdrawConfirmed, withdrawHash, withdrawAmount, refetchTotalAssets, refetchUserShares, success])
 
   const handleApprove = () => {
     if (!depositAmount) return

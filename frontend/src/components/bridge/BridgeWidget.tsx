@@ -11,6 +11,7 @@ import { useTxToast } from '@/components/ui/Toast'
 import { ChainLogo } from '@/components/ui/TokenLogos'
 import { Confetti } from '@/components/ui/Confetti'
 import { StepIndicator } from '@/components/ui/EmptyState'
+import { saveTransaction } from '@/lib/transactions'
 
 // Bridge Kit supported chains for Arc Testnet
 const BRIDGE_CHAINS = [
@@ -141,7 +142,19 @@ export function BridgeWidget() {
       if (result.state === 'success') {
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 100)
-        success(toastId, 'Bridge Complete!', result.steps?.[result.steps.length - 1]?.txHash)
+        const finalTxHash = result.steps?.[result.steps.length - 1]?.txHash || result.steps?.[0]?.txHash
+        success(toastId, 'Bridge Complete!', finalTxHash)
+        // Save to transaction history
+        saveTransaction({
+          hash: finalTxHash || `bridge-${Date.now()}`,
+          type: 'bridge',
+          timestamp: Date.now(),
+          tokenIn: 'USDC',
+          tokenOut: 'USDC',
+          amountIn: amount,
+          amountOut: amount,
+          status: 'success',
+        })
         setAmount('')
       } else if (result.state === 'error') {
         // Get error details from failed step

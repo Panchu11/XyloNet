@@ -14,6 +14,7 @@ import { InfoTooltip } from '@/components/ui/Tooltip'
 import { Confetti } from '@/components/ui/Confetti'
 import { Sparkline } from '@/components/ui/EmptyState'
 import { TiltCard } from '@/components/ui/TiltCard'
+import { saveTransaction } from '@/lib/transactions'
 
 // Pool addresses from deployment
 const POOL_ADDRESSES = {
@@ -235,11 +236,20 @@ export default function PoolsPage() {
 
   // Reset and refetch after successful add/remove
   useEffect(() => {
-    if (isAddConfirmed) {
+    if (isAddConfirmed && addLiqHash && selectedPool) {
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Liquidity Added!', addLiqHash)
         toastIdRef.current = null
       }
+      // Save to transaction history
+      saveTransaction({
+        hash: addLiqHash,
+        type: 'add_liquidity',
+        timestamp: Date.now(),
+        tokenIn: `${selectedPool.token0.symbol}/${selectedPool.token1.symbol}`,
+        amountIn: `${amount0} + ${amount1}`,
+        status: 'success',
+      })
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 100)
       setAmount0('')
@@ -249,20 +259,29 @@ export default function PoolsPage() {
       refetchUsdcEurc()
       refetchUsdcUsyc()
     }
-  }, [isAddConfirmed, addLiqHash, refetchUsdcEurc, refetchUsdcUsyc, success])
+  }, [isAddConfirmed, addLiqHash, selectedPool, amount0, amount1, refetchUsdcEurc, refetchUsdcUsyc, success])
 
   useEffect(() => {
-    if (isRemoveConfirmed) {
+    if (isRemoveConfirmed && removeLiqHash && selectedPool) {
       if (toastIdRef.current) {
         success(toastIdRef.current, 'Liquidity Removed!', removeLiqHash)
         toastIdRef.current = null
       }
+      // Save to transaction history
+      saveTransaction({
+        hash: removeLiqHash,
+        type: 'remove_liquidity',
+        timestamp: Date.now(),
+        tokenOut: `${selectedPool.token0.symbol}/${selectedPool.token1.symbol}`,
+        amountOut: lpAmount,
+        status: 'success',
+      })
       setLpAmount('')
       setShowRemoveLiquidity(false)
       refetchUsdcEurc()
       refetchUsdcUsyc()
     }
-  }, [isRemoveConfirmed, removeLiqHash, refetchUsdcEurc, refetchUsdcUsyc, success])
+  }, [isRemoveConfirmed, removeLiqHash, selectedPool, lpAmount, refetchUsdcEurc, refetchUsdcUsyc, success])
 
   const handleApprove0 = () => {
     if (!selectedPool || !amount0) return
