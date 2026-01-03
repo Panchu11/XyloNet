@@ -1,145 +1,242 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface Feature {
+  id: string;
   icon: React.ReactNode;
   title: string;
   description: string;
   gradient: string;
+  size: 'normal' | 'large' | 'wide';
+  link?: string;
+  metric?: { value: string; label: string };
 }
 
 const features: Feature[] = [
   {
+    id: 'swap',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
-        <path d="M12 4v16m8-8H4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-        <path d="M8 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     title: 'StableSwap AMM',
-    description: 'Trade stablecoins with near-zero slippage using Curve\'s proven invariant algorithm. Optimized for USDC, EURC, and USYC pairs.',
+    description: 'Trade USDC, EURC with near-zero slippage using Curve\'s battle-tested invariant algorithm. Optimized for stablecoin pairs.',
     gradient: 'from-blue-500 to-cyan-500',
+    size: 'large',
+    link: '/swap',
+    metric: { value: '0.04%', label: 'Swap Fee' },
   },
   {
+    id: 'bridge',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
-        <path d="M4 12h4m12 0h-4m-4-8v4m0 8v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-        <path d="M8 8l-2-2m12 12l-2-2m0-8l2-2m-12 12l2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     title: 'Cross-Chain Bridge',
-    description: 'Transfer USDC across 7+ chains with Circle CCTP V2. Fast, secure, and native - no wrapped tokens or liquidity pools.',
+    description: 'Native USDC transfers across 7+ chains via Circle CCTP V2. No wrapped tokens, no liquidity pools needed.',
     gradient: 'from-purple-500 to-pink-500',
+    size: 'normal',
+    link: '/bridge',
+    metric: { value: '~30s', label: 'Transfer Time' },
   },
   {
+    id: 'vault',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
-        <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
-        <path d="M4 9h16M9 4v16" stroke="currentColor" strokeWidth="2"/>
-        <path d="M12 13l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M3 9h18M9 21V9" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="6" cy="6" r="1" fill="currentColor"/>
       </svg>
     ),
     title: 'Yield Vault',
-    description: 'Earn yield on your stablecoins with ERC-4626 compliant vaults. Auto-compounding strategies powered by USYC.',
-    gradient: 'from-green-500 to-emerald-500',
+    description: 'ERC-4626 compliant vaults for passive income on your stablecoins.',
+    gradient: 'from-emerald-500 to-green-500',
+    size: 'normal',
+    link: '/vault',
+    metric: { value: 'Auto', label: 'Compound' },
   },
   {
+    id: 'speed',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
-    title: 'Lightning Fast',
-    description: 'Sub-350ms transaction finality on Arc Network. No more waiting or uncertainty - trades settle instantly.',
+    title: 'Sub-Second Finality',
+    description: 'Arc Network delivers <350ms transaction finality. No more waiting or uncertainty.',
     gradient: 'from-yellow-500 to-orange-500',
+    size: 'wide',
+    metric: { value: '<350ms', label: 'Finality' },
   },
   {
+    id: 'fees',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
         <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-        <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M9 16l-2 2m8-2l2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M12 6v12M9 9h6M9 15h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
       </svg>
     ),
     title: 'Ultra Low Fees',
-    description: 'Pay ~$0.01 per transaction using native USDC for gas. No ETH required, no bridging needed.',
+    description: 'Pay ~$0.01 per transaction using native USDC for gas. No ETH required.',
     gradient: 'from-cyan-500 to-blue-500',
+    size: 'normal',
+    metric: { value: '~$0.01', label: 'Per Tx' },
   },
   {
+    id: 'security',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
-        <path d="M12 3l9 4.5v7c0 4-4 7-9 9-5-2-9-5-9-9v-7L12 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M12 3l9 4.5v5c0 4.69-3.75 8.69-9 10.5-5.25-1.81-9-5.81-9-10.5v-5L12 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
-    title: 'Battle-Tested Security',
-    description: 'Built on Circle\'s trusted infrastructure with audited smart contracts. Your funds are always safe.',
+    title: 'Enterprise Security',
+    description: 'Built on Circle\'s institutional-grade infrastructure with audited contracts.',
     gradient: 'from-rose-500 to-red-500',
+    size: 'normal',
+    metric: { value: '100%', label: 'Secure' },
   },
 ];
 
 function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
+    if (cardRef.current) observer.observe(cardRef.current);
     return () => observer.disconnect();
   }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePos({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    });
+  };
+
+  const cardContent = (
+    <>
+      {/* Card content */}
+      <div className={`p-6 md:p-8 h-full flex flex-col ${feature.size === 'large' ? 'md:p-10' : ''}`}>
+        {/* Icon with gradient background */}
+        <div 
+          className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} p-0.5 mb-4 md:mb-6 transition-transform duration-500 ${
+            isHovered ? 'scale-110 rotate-3' : ''
+          }`}
+        >
+          <div className="w-full h-full bg-[#0d0e12] rounded-[14px] flex items-center justify-center text-white">
+            {feature.icon}
+          </div>
+        </div>
+        
+        {/* Title */}
+        <h3 className={`font-bold text-white mb-2 md:mb-3 ${
+          feature.size === 'large' ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'
+        }`}>
+          {feature.title}
+        </h3>
+        
+        {/* Description */}
+        <p className={`text-gray-400 leading-relaxed flex-grow ${
+          feature.size === 'large' ? 'text-base md:text-lg' : 'text-sm md:text-base'
+        }`}>
+          {feature.description}
+        </p>
+        
+        {/* Metric badge */}
+        {feature.metric && (
+          <div className="mt-4 md:mt-6 flex items-center gap-3">
+            <div className={`px-4 py-2 rounded-xl bg-gradient-to-r ${feature.gradient} bg-opacity-10`}>
+              <span className="text-lg md:text-xl font-bold text-white">{feature.metric.value}</span>
+            </div>
+            <span className="text-sm text-gray-500">{feature.metric.label}</span>
+          </div>
+        )}
+        
+        {/* Arrow indicator for linked cards */}
+        {feature.link && (
+          <div className={`absolute bottom-6 right-6 md:bottom-8 md:right-8 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center transition-all duration-300 ${
+            isHovered ? 'bg-white/10 scale-110' : ''
+          }`}>
+            <svg 
+              className={`w-5 h-5 text-white/50 transition-all duration-300 ${isHovered ? 'text-white translate-x-0.5' : ''}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </div>
+        )}
+      </div>
+      
+      {/* Holographic shine effect */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+        style={{
+          background: `linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 45%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 55%, transparent 60%)`,
+          transform: isHovered ? 'translateX(100%)' : 'translateX(-100%)',
+          transition: 'transform 0.7s ease-in-out, opacity 0.3s',
+        }}
+      />
+    </>
+  );
+
+  const cardClassName = `relative block h-full bg-[#0d0e12]/80 backdrop-blur-sm border border-white/5 rounded-2xl md:rounded-3xl overflow-hidden transition-all duration-500 group-hover:border-white/10`;
 
   return (
     <div
       ref={cardRef}
       className={`relative group transition-all duration-700 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      } ${
+        feature.size === 'large' ? 'md:col-span-2 md:row-span-2' :
+        feature.size === 'wide' ? 'md:col-span-2' : ''
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onMouseMove={handleMouseMove}
     >
-      {/* Glow effect */}
+      {/* Gradient glow effect on hover */}
       <div 
-        className={`absolute -inset-0.5 bg-gradient-to-r ${feature.gradient} rounded-2xl opacity-0 blur-lg transition-opacity duration-300 ${
-          isHovered ? 'opacity-50' : ''
+        className={`absolute -inset-0.5 bg-gradient-to-r ${feature.gradient} rounded-2xl md:rounded-3xl opacity-0 blur-xl transition-all duration-500 ${
+          isHovered ? 'opacity-40' : ''
         }`}
       />
       
-      {/* Card content */}
-      <div className="relative h-full bg-[#0d0e12] border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 hover:border-white/20 transition-all duration-300">
-        {/* Icon */}
-        <div className={`w-12 md:w-14 h-12 md:h-14 rounded-lg md:rounded-xl bg-gradient-to-r ${feature.gradient} p-2.5 md:p-3 text-white mb-3 md:mb-4 shadow-lg`}>
-          {feature.icon}
+      {/* Spotlight effect following mouse */}
+      <div 
+        className="absolute -inset-px rounded-2xl md:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.06), transparent 40%)`,
+        }}
+      />
+      
+      {feature.link ? (
+        <Link href={feature.link} className={cardClassName}>
+          {cardContent}
+        </Link>
+      ) : (
+        <div className={cardClassName}>
+          {cardContent}
         </div>
-        
-        {/* Title */}
-        <h3 className="text-lg md:text-xl font-bold text-white mb-2">{feature.title}</h3>
-        
-        {/* Description */}
-        <p className="text-sm md:text-base text-gray-400 leading-relaxed">{feature.description}</p>
-        
-        {/* Hover arrow */}
-        <div className={`absolute bottom-4 md:bottom-6 right-4 md:right-6 opacity-0 transform translate-x-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-x-0' : ''}`}>
-          <svg className="w-5 md:w-6 h-5 md:h-6 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -151,54 +248,73 @@ export default function Features() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-16 md:py-24 px-4">
+    <section ref={sectionRef} className="relative py-24 md:py-32 px-4 overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent" />
+      <div className="absolute inset-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px]" />
+      </div>
       
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Section header */}
         <div 
-          className={`text-center mb-12 md:mb-16 transition-all duration-700 ${
+          className={`text-center mb-16 md:mb-20 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-4 md:mb-6">
-            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-            <span className="text-blue-400 text-sm font-medium">Why XyloNet?</span>
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-5 py-2.5 mb-6 md:mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span className="text-blue-400 text-sm font-medium tracking-wide">Why XyloNet</span>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4 px-4">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 md:mb-6 tracking-tight">
             Everything You Need for{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
-              Stablecoins
+            <span className="relative">
+              <span className="relative z-10 bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 text-transparent bg-clip-text">
+                Stablecoins
+              </span>
             </span>
           </h2>
           
-          <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto px-4">
-            The complete DeFi hub for stablecoin trading, bridging, and earning — all on Arc Network.
+          <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
+            A complete DeFi hub for stablecoin trading, bridging, and earning — all powered by Arc Network&apos;s lightning-fast infrastructure.
           </p>
         </div>
 
-        {/* Features grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {features.map((feature, index) => (
-            <FeatureCard key={feature.title} feature={feature} index={index} />
+            <FeatureCard key={feature.id} feature={feature} index={index} />
           ))}
+        </div>
+        
+        {/* Bottom CTA */}
+        <div 
+          className={`mt-16 md:mt-20 text-center transition-all duration-700 delay-500 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <Link
+            href="/swap"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
+          >
+            <span>Start Trading Now</span>
+            <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
         </div>
       </div>
     </section>

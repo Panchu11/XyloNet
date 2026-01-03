@@ -3,50 +3,77 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
-// Animated counter component
-function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
+// Animated number counter with formatting
+function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0);
-  const countRef = useRef<HTMLSpanElement>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const duration = 2000;
-    const start = 0;
-    const end = value;
-    const startTime = performance.now();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const duration = 2000;
+          const startTime = performance.now();
+          
+          const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 4);
+            setCount(Math.floor(value * easeOut));
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(start + (end - start) * easeOut);
-      setCount(current);
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [value, hasAnimated]);
 
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [value]);
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toLocaleString();
+  };
 
   return (
-    <span ref={countRef}>
-      {count.toLocaleString()}{suffix}
+    <span ref={ref} className="tabular-nums">
+      {prefix}{formatNumber(count)}{suffix}
     </span>
+  );
+}
+
+// Floating particle component
+function FloatingParticle({ delay, size, left, duration }: { delay: number; size: number; left: string; duration: number }) {
+  return (
+    <div 
+      className="absolute bottom-0 rounded-full bg-gradient-to-t from-blue-500/40 to-cyan-400/20 blur-sm"
+      style={{
+        width: size,
+        height: size,
+        left,
+        animation: `float-up ${duration}s ease-in-out infinite`,
+        animationDelay: `${delay}s`,
+      }}
+    />
   );
 }
 
 export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     setIsVisible(true);
     
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
       });
     };
 
@@ -55,129 +82,193 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
-      {/* Animated gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Animated mesh gradient background */}
+      <div className="absolute inset-0 bg-[#050507]">
+        {/* Primary gradient blob */}
         <div 
-          className="absolute w-[500px] md:w-[800px] h-[500px] md:h-[800px] rounded-full opacity-20 md:opacity-30 blur-[100px] md:blur-[120px]"
+          className="absolute w-[1000px] h-[1000px] rounded-full opacity-30 blur-[150px]"
           style={{
-            background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #06B6D4 100%)',
-            top: '10%',
-            left: '20%',
-            transform: `translate(${mousePosition.x * 0.5}px, ${mousePosition.y * 0.5}px)`,
-            transition: 'transform 0.3s ease-out',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.8) 0%, rgba(139,92,246,0.4) 50%, transparent 70%)',
+            top: `calc(20% + ${(mousePosition.y - 0.5) * 50}px)`,
+            left: `calc(30% + ${(mousePosition.x - 0.5) * 50}px)`,
+            transition: 'top 0.8s ease-out, left 0.8s ease-out',
           }}
         />
+        
+        {/* Secondary gradient blob */}
         <div 
-          className="absolute w-[400px] md:w-[600px] h-[400px] md:h-[600px] rounded-full opacity-15 md:opacity-20 blur-[80px] md:blur-[100px]"
+          className="absolute w-[800px] h-[800px] rounded-full opacity-20 blur-[120px]"
           style={{
-            background: 'linear-gradient(135deg, #06B6D4 0%, #10B981 100%)',
-            bottom: '10%',
-            right: '10%',
-            transform: `translate(${mousePosition.x * -0.3}px, ${mousePosition.y * -0.3}px)`,
-            transition: 'transform 0.3s ease-out',
+            background: 'radial-gradient(circle, rgba(6,182,212,0.8) 0%, rgba(16,185,129,0.3) 60%, transparent 70%)',
+            bottom: `calc(10% + ${(mousePosition.y - 0.5) * -30}px)`,
+            right: `calc(20% + ${(mousePosition.x - 0.5) * -30}px)`,
+            transition: 'bottom 0.8s ease-out, right 0.8s ease-out',
           }}
         />
+
+        {/* Accent blob */}
+        <div 
+          className="absolute w-[600px] h-[600px] rounded-full opacity-15 blur-[100px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(236,72,153,0.6) 0%, transparent 60%)',
+            top: '60%',
+            left: '60%',
+          }}
+        />
+
+        {/* Noise texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+
+        {/* Grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                             linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }}
+        />
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <FloatingParticle delay={0} size={4} left="10%" duration={15} />
+          <FloatingParticle delay={2} size={6} left="20%" duration={18} />
+          <FloatingParticle delay={4} size={3} left="35%" duration={12} />
+          <FloatingParticle delay={1} size={5} left="50%" duration={20} />
+          <FloatingParticle delay={3} size={4} left="65%" duration={16} />
+          <FloatingParticle delay={5} size={7} left="80%" duration={22} />
+          <FloatingParticle delay={2.5} size={3} left="90%" duration={14} />
+        </div>
       </div>
 
-      {/* Grid pattern overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] md:opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-        }}
-      />
-
       {/* Main content */}
-      <div className="relative z-10 text-center max-w-5xl mx-auto w-full">
-        {/* Logo with 3D effect */}
+      <div className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+        {/* Trust badge row */}
         <div 
-          className={`mb-6 md:mb-8 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-          style={{
-            transform: `perspective(1000px) rotateY(${mousePosition.x * 0.05}deg) rotateX(${mousePosition.y * -0.05}deg)`,
-          }}
+          className={`flex flex-wrap items-center justify-center gap-3 mb-8 transition-all duration-1000 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
         >
-          <div className="inline-flex items-center gap-2 md:gap-3 bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl px-4 md:px-6 py-2 md:py-3">
-            <div className="relative">
-              <div className="w-10 md:w-12 h-10 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <img src="/logo.png" alt="XyloNet" className="w-6 md:w-8 h-6 md:h-8 object-contain" />
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-lg md:rounded-xl blur opacity-40 animate-pulse" />
-            </div>
-            <span className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
-              XyloNet
-            </span>
+          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-sm text-gray-300">Live on Arc Testnet</span>
+          </div>
+          <div className="flex items-center gap-2 bg-blue-500/10 backdrop-blur-sm border border-blue-500/20 rounded-full px-4 py-2">
+            <img src="/chains/arc.png" alt="Arc" className="w-4 h-4" />
+            <span className="text-sm text-blue-300">Circle Verified</span>
+          </div>
+          <div className="flex items-center gap-2 bg-purple-500/10 backdrop-blur-sm border border-purple-500/20 rounded-full px-4 py-2">
+            <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="text-sm text-purple-300">Secure</span>
           </div>
         </div>
 
-        {/* Main headline with gradient animation */}
-        <h1 
-          className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 md:mb-6 leading-tight transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-        >
-          <span className="block text-white animate-gradient-x mb-2">
-            The Stablecoin
-          </span>
-          <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 text-transparent bg-clip-text animate-gradient-x animation-delay-500" style={{ lineHeight: '1.2', transform: 'translateZ(0)' }}>
-            SuperExchange
-          </span>
-        </h1>
+        {/* Main headline with kinetic typography */}
+        <div className={`mb-6 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight">
+            <span className="block text-white mb-2 leading-[1.1]">
+              The Stablecoin
+            </span>
+            <span className="relative inline-block">
+              <span className="relative z-10 bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 text-transparent bg-clip-text leading-[1.1]">
+                SuperExchange
+              </span>
+              {/* Animated underline */}
+              <span className="absolute -bottom-2 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 rounded-full transform origin-left animate-expand" />
+            </span>
+          </h1>
+        </div>
 
         {/* Subheadline */}
-        <p 
-          className={`text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 mb-8 md:mb-12 max-w-2xl mx-auto px-4 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-        >
-          Trade • Bridge • Earn — All in one place on{' '}
-          <span className="text-cyan-400 font-semibold">Arc Network</span>
+        <p className={`text-lg sm:text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          Swap stablecoins with <span className="text-cyan-400 font-medium">near-zero slippage</span>. 
+          Bridge across <span className="text-purple-400 font-medium">7+ chains</span> instantly. 
+          All on <span className="text-blue-400 font-medium">Arc Network</span>.
         </p>
 
         {/* CTA Buttons */}
-        <div 
-          className={`flex flex-col sm:flex-row gap-3 md:gap-4 justify-center mb-12 md:mb-16 px-4 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-        >
+        <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Link
             href="/swap"
-            className="group relative inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-xl md:rounded-2xl font-bold text-base md:text-lg text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105 active:scale-95"
+            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 overflow-hidden rounded-2xl font-bold text-lg text-white transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            <span className="absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Gradient background */}
+            <span className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500" />
+            {/* Animated shine */}
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+            {/* Glow effect */}
+            <span className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+            
             <span className="relative flex items-center gap-2">
-              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Enter App
+              Launch App
+              <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </span>
-            <span className="relative ml-1 group-hover:translate-x-1 transition-transform duration-300">→</span>
           </Link>
           
-          <span
-            className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl font-semibold text-base md:text-lg text-white opacity-50 cursor-not-allowed transition-all duration-300"
+          <Link
+            href="/bridge"
+            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-semibold text-lg text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
           >
-            <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+            <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
-            <span className="hidden sm:inline">View on GitHub</span>
-            <span className="sm:hidden">GitHub</span>
-          </span>
+            Bridge USDC
+          </Link>
         </div>
 
-
+        {/* Live stats */}
+        <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          {[
+            { label: 'Total Value Locked', value: 125000, prefix: '$', suffix: '' },
+            { label: 'Total Swaps', value: 8420, prefix: '', suffix: '' },
+            { label: 'Unique Users', value: 1250, prefix: '', suffix: '+' },
+            { label: 'Avg. Gas Cost', value: 0.01, prefix: '~$', suffix: '' },
+          ].map((stat, index) => (
+            <div 
+              key={stat.label}
+              className="relative group"
+            >
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 md:p-6 hover:border-white/20 transition-all duration-300">
+                <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                  {stat.value < 1 ? (
+                    <span>{stat.prefix}{stat.value}{stat.suffix}</span>
+                  ) : (
+                    <AnimatedCounter value={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
+                  )}
+                </div>
+                <div className="text-xs md:text-sm text-gray-400">{stat.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Scroll indicator */}
-        <div className={`mt-12 md:mt-16 transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="flex flex-col items-center gap-2 text-gray-500">
-            <span className="text-xs md:text-sm">Scroll to explore</span>
-            <div className="w-5 md:w-6 h-8 md:h-10 border-2 border-gray-500 rounded-full flex justify-center p-1">
-              <div className="w-1.5 h-2 md:h-3 bg-gray-500 rounded-full animate-bounce" />
+        <div className={`mt-16 md:mt-20 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="flex flex-col items-center gap-3 text-gray-500">
+            <span className="text-sm tracking-wider uppercase">Explore</span>
+            <div className="relative w-6 h-10 border-2 border-gray-600 rounded-full">
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-1.5 h-3 bg-gradient-to-b from-white to-gray-500 rounded-full animate-scroll-down" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a0b0f] to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#050507] via-[#050507]/80 to-transparent" />
     </section>
   );
 }

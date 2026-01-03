@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f0f25;
+  --background: #050507;
   --foreground: #ffffff;
-  --card-bg: #1a1a3a;
-  --card-border: #2d2d5d;
-  --primary: #7a6eef;
-  --primary-hover: #6a5ee0;
-  --secondary: #9d94ff;
-  --accent: #5a4fcf;
-  --success: #00c9a7;
-  --warning: #ffc107;
-  --error: #ff6b6b;
+  --card-bg: #0d0e12;
+  --card-border: #1a1b23;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary: #8b5cf6;
+  --accent: #06b6d4;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
   --text-primary: #ffffff;
-  --text-secondary: #a0a0c0;
-  --text-muted: #707090;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
 }
 
 @theme inline {
@@ -92,6 +92,287 @@ body {
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* ========================================
+   WORLD-CLASS LANDING PAGE ANIMATIONS
+   ======================================== */
+
+/* Expand underline animation */
+@keyframes expand {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.animate-expand {
+  animation: expand 0.8s ease-out 0.5s forwards;
+  transform: scaleX(0);
+}
+
+/* Floating particles */
+@keyframes float-up {
+  0% { 
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Scroll indicator */
+@keyframes scroll-down {
+  0% { 
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateX(-50%) translateY(12px);
+    opacity: 0;
+  }
+}
+
+.animate-scroll-down {
+  animation: scroll-down 1.5s ease-in-out infinite;
+}
+
+/* 3D Card tilt effect */
+.card-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d-inner {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover .card-3d-inner {
+  transform: rotateY(10deg) rotateX(5deg);
+}
+
+/* Glow pulse */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3),
+                0 0 40px rgba(59, 130, 246, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5),
+                0 0 60px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Gradient border animation */
+@keyframes gradient-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animated-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #06b6d4, #10b981, #3b82f6);
+  animation: gradient-rotate 4s linear infinite;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.animated-border::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--card-bg);
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Magnetic button effect (cursor-following) */
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Text reveal animation */
+@keyframes text-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.animate-text-reveal {
+  animation: text-reveal 0.8s ease-out forwards;
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Bento box grid styles */
+.bento-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+  }
+  
+  .bento-large {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  .bento-wide {
+    grid-column: span 2;
+  }
+  
+  .bento-tall {
+    grid-row: span 2;
+  }
+}
+
+/* Premium glass card */
+.glass-premium {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 
+    0 4px 24px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.glass-premium:hover {
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Holographic effect */
+.holographic {
+  position: relative;
+  overflow: hidden;
+}
+
+.holographic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.03) 45%,
+    rgba(255,255,255,0.05) 50%,
+    rgba(255,255,255,0.03) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.holographic:hover::before {
+  transform: translateX(100%);
+}
+
+/* Icon bounce */
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-icon-bounce:hover svg {
+  animation: icon-bounce 0.6s ease-in-out;
+}
+
+/* Number ticker animation */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Card lift effect */
+.card-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0,0,0,0.3),
+    0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+/* Depth shadow */
+.depth-shadow {
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.1),
+    0 4px 8px rgba(0,0,0,0.1),
+    0 8px 16px rgba(0,0,0,0.1),
+    0 16px 32px rgba(0,0,0,0.15);
+}
+
+/* Smooth appear */
+@keyframes smooth-appear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-smooth-appear {
+  animation: smooth-appear 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Staggered fade in for sections */
+.stagger-fade > *:nth-child(1) { animation: smooth-appear 0.6s ease-out 0.1s forwards; opacity: 0; }
+.stagger-fade > *:nth-child(2) { animation: smooth-appear 0.6s ease-out 0.2s forwards; opacity: 0; }
+.stagger-fade > *:nth-child(3) { animation: smooth-appear 0.6s ease-out 0.3s forwards; opacity: 0; }
+.stagger-fade > *:nth-child(4) { animation: smooth-appear 0.6s ease-out 0.4s forwards; opacity: 0; }
+
+/* Gradient text animation */
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient-x {
+  background-size: 200% auto;
+  animation: gradient-x 8s linear infinite;
 }
 
 .animate-float {

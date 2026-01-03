@@ -5,73 +5,144 @@ import { useEffect, useRef, useState } from 'react';
 const arcFeatures = [
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-        <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
     title: 'Sub-Second Finality',
-    description: '<350ms deterministic settlement',
+    description: 'Deterministic settlement',
+    metric: '<350ms',
+    color: 'from-cyan-400 to-blue-500',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-        <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
-        <path d="M12 8v8M8 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M12 7v6M9 14h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
     title: 'Native USDC Gas',
-    description: 'Pay fees directly in USDC',
+    description: 'Pay fees in stablecoins',
+    metric: 'USDC',
+    color: 'from-blue-400 to-indigo-500',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-        <path d="M12 2L4 7l8 5 8-5-8-5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M4 12l8 5 8-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M4 17l8 5 8-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7">
+        <path d="M12 2L4 7l8 5 8-5-8-5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4 12l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M4 17l8 5 8-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     title: 'Circle CCTP V2',
-    description: 'Native cross-chain USDC',
+    description: 'Native cross-chain',
+    metric: '7+ Chains',
+    color: 'from-purple-400 to-pink-500',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-        <path d="M12 3l9 4.5v7c0 4-4 7-9 9-5-2-9-5-9-9v-7L12 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7">
+        <path d="M12 3l9 4.5v5c0 4.69-3.75 8.69-9 10.5-5.25-1.81-9-5.81-9-10.5v-5L12 3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
-    title: 'Enterprise Security',
-    description: 'Institutional-grade infrastructure',
+    title: 'Enterprise Grade',
+    description: 'Institutional security',
+    metric: 'SOC 2',
+    color: 'from-emerald-400 to-green-500',
   },
 ];
 
-export default function PoweredByArc() {
+function FeatureCard({ feature, index }: { feature: typeof arcFeatures[0]; index: number }) {
+  const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (cardRef.current) observer.observe(cardRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-16 md:py-24 px-4 overflow-hidden">
+    <div
+      ref={cardRef}
+      className={`relative group transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      }`}
+      style={{ transitionDelay: `${index * 100 + 200}ms` }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Gradient glow on hover */}
+      <div 
+        className={`absolute -inset-0.5 bg-gradient-to-r ${feature.color} rounded-2xl blur-lg opacity-0 transition-opacity duration-500 ${
+          isHovered ? 'opacity-40' : ''
+        }`}
+      />
+      
+      <div className="relative bg-white/[0.02] backdrop-blur-sm border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all duration-500 h-full">
+        {/* Metric badge */}
+        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r ${feature.color} bg-opacity-10 mb-4`}>
+          <span className="text-sm font-bold text-white">{feature.metric}</span>
+        </div>
+        
+        {/* Icon */}
+        <div 
+          className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} bg-opacity-10 flex items-center justify-center text-cyan-400 mb-3 transition-transform duration-300 ${
+            isHovered ? 'scale-110' : ''
+          }`}
+        >
+          {feature.icon}
+        </div>
+        
+        {/* Text */}
+        <h4 className="text-base font-semibold text-white mb-1">{feature.title}</h4>
+        <p className="text-sm text-gray-500">{feature.description}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function PoweredByArc() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMousePosition({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    });
+  };
+
+  return (
+    <section ref={sectionRef} className="relative py-24 md:py-32 px-4 overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-blue-500/10 rounded-full blur-[100px] md:blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] bg-gradient-to-r from-blue-500/8 via-cyan-500/5 to-purple-500/8 rounded-full blur-[150px]" />
       </div>
       
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -80,82 +151,129 @@ export default function PoweredByArc() {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          {/* Main card */}
-          <div className="relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 rounded-2xl md:rounded-3xl blur opacity-20" />
-            <div className="relative bg-gradient-to-br from-[#0d0e12] to-[#0a0b0f] border border-white/10 rounded-2xl md:rounded-3xl p-6 md:p-12">
-              <div className="flex flex-col lg:flex-row items-center gap-8 md:gap-12">
-                {/* Left side - Arc logo and info */}
-                <div className="flex-1 text-center lg:text-left w-full">
-                  <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-4 md:mb-6">
-                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    <span className="text-blue-400 text-sm font-medium">Powered By</span>
+          {/* Main showcase card */}
+          <div 
+            ref={cardRef}
+            className="relative group"
+            onMouseMove={handleMouseMove}
+          >
+            {/* Animated border gradient */}
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 rounded-[28px] opacity-20 blur-sm" />
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 rounded-[28px] opacity-10" />
+            
+            {/* Spotlight effect */}
+            <div 
+              className="absolute -inset-px rounded-[28px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+              style={{
+                background: `radial-gradient(800px circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(56,189,248,0.1), transparent 40%)`,
+              }}
+            />
+            
+            <div className="relative bg-gradient-to-br from-[#0a0b0f] via-[#0d0e14] to-[#0a0b0f] border border-white/5 rounded-[28px] p-8 md:p-12 lg:p-16 overflow-hidden">
+              {/* Inner glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] bg-gradient-to-b from-cyan-500/10 to-transparent rounded-full blur-[100px]" />
+              
+              <div className="relative">
+                {/* Badge */}
+                <div className="flex justify-center mb-8">
+                  <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-cyan-500/20 rounded-full px-5 py-2.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    </span>
+                    <span className="text-cyan-400 text-sm font-medium tracking-wide">Built On</span>
                   </div>
-                  
-                  {/* Arc logo representation */}
-                  <a href="https://www.arc.network/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center lg:justify-start gap-3 md:gap-4 mb-4 md:mb-6">
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                      <img src="/chains/arc.png" alt="Arc Network" className="w-9 md:w-12 h-9 md:h-12 object-contain" />
+                </div>
+                
+                {/* Arc branding */}
+                <div className="text-center mb-12">
+                  <a 
+                    href="https://www.arc.network/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex flex-col sm:flex-row items-center gap-4 md:gap-6 group/link mb-6"
+                  >
+                    <div className="relative">
+                      {/* Logo glow */}
+                      <div className="absolute -inset-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur-xl opacity-40 group-hover/link:opacity-60 transition-opacity duration-500" />
+                      <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-[#0a0b0f] border border-white/10 flex items-center justify-center overflow-hidden">
+                        <img src="/chains/arc.png" alt="Arc Network" className="w-14 md:w-16 h-14 md:h-16 object-contain" />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white">Arc Network</h3>
-                      <p className="text-sm md:text-base text-gray-400">By Circle</p>
+                    <div className="text-center sm:text-left">
+                      <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white group-hover/link:text-cyan-300 transition-colors duration-300">
+                        Arc Network
+                      </h3>
+                      <p className="text-base md:text-lg text-gray-500 mt-1 flex items-center justify-center sm:justify-start gap-2">
+                        <span>by</span>
+                        <span className="text-cyan-400 font-medium">Circle</span>
+                      </p>
                     </div>
                   </a>
                   
-                  <p className="text-sm md:text-base lg:text-lg text-gray-400 mb-6 md:mb-8 max-w-lg mx-auto lg:mx-0">
-                    Arc is Circle&apos;s Layer 1 blockchain purpose-built for stablecoin applications. 
-                    It combines the security of traditional finance with the innovation of DeFi.
+                  <p className="text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                    Circle&apos;s Layer 1 blockchain purpose-built for stablecoin applications — 
+                    <span className="text-white"> institutional security</span> meets 
+                    <span className="text-cyan-400"> DeFi innovation</span>.
                   </p>
-                  
+                </div>
+
+                {/* Features grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {arcFeatures.map((feature, index) => (
+                    <FeatureCard key={feature.title} feature={feature} index={index} />
+                  ))}
+                </div>
+
+                {/* CTAs */}
+                <div className="mt-10 md:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <a
                     href="https://www.arc.network/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 bg-white/10 border border-white/20 rounded-lg md:rounded-xl font-medium text-sm md:text-base text-white hover:bg-white/20 transition-all duration-300"
+                    className="group/btn relative inline-flex items-center justify-center gap-2.5 px-7 py-3.5 overflow-hidden rounded-xl font-semibold text-white transition-all duration-300 hover:scale-105 active:scale-95"
                   >
-                    Learn More About Arc
-                    <svg className="w-3.5 md:w-4 h-3.5 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
+                    <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
+                    <span className="relative flex items-center gap-2">
+                      Explore Arc Network
+                      <svg className="w-4 h-4 transform group-hover/btn:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </span>
                   </a>
-                </div>
-
-                {/* Right side - Features grid */}
-                <div className="flex-1 grid grid-cols-2 gap-3 md:gap-4 w-full">
-                  {arcFeatures.map((feature, index) => (
-                    <div 
-                      key={feature.title}
-                      className={`bg-white/5 border border-white/10 rounded-lg md:rounded-xl p-3 md:p-4 hover:border-white/20 transition-all duration-300 ${
-                        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                      }`}
-                      style={{ transitionDelay: `${index * 100 + 300}ms` }}
-                    >
-                      <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2 md:mb-3">
-                        {feature.icon}
-                      </div>
-                      <h4 className="text-sm md:text-base font-semibold text-white mb-1">{feature.title}</h4>
-                      <p className="text-xs md:text-sm text-gray-400">{feature.description}</p>
-                    </div>
-                  ))}
+                  
+                  <a
+                    href="https://faucet.circle.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white/5 border border-white/10 rounded-xl font-semibold text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 active:scale-95"
+                  >
+                    <svg className="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Get Testnet USDC
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Circle badge */}
+        {/* Trust badge */}
         <div 
-          className={`mt-8 md:mt-12 text-center transition-all duration-700 delay-500 ${
+          className={`mt-10 text-center transition-all duration-700 delay-500 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <p className="text-gray-500 text-xs md:text-sm flex items-center justify-center gap-2">
-            <svg viewBox="0 0 24 24" className="w-4 md:w-5 h-4 md:h-5" fill="currentColor">
-              <circle cx="12" cy="12" r="10"/>
-            </svg>
-            Built on Circle&apos;s trusted infrastructure
-          </p>
+          <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/[0.02] border border-white/5 rounded-full">
+            <div className="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-3 h-3 text-white" fill="currentColor">
+                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <span className="text-sm text-gray-400">Built on Circle&apos;s trusted infrastructure</span>
+          </div>
         </div>
       </div>
     </section>
