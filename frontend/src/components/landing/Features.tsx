@@ -121,21 +121,21 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
       />
       
       {/* Card content */}
-      <div className="relative h-full bg-[#0d0e12] border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all duration-300">
+      <div className="relative h-full bg-[#0d0e12] border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6 hover:border-white/20 transition-all duration-300">
         {/* Icon */}
-        <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${feature.gradient} p-3 text-white mb-4 shadow-lg`}>
+        <div className={`w-12 md:w-14 h-12 md:h-14 rounded-lg md:rounded-xl bg-gradient-to-r ${feature.gradient} p-2.5 md:p-3 text-white mb-3 md:mb-4 shadow-lg`}>
           {feature.icon}
         </div>
         
         {/* Title */}
-        <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+        <h3 className="text-lg md:text-xl font-bold text-white mb-2">{feature.title}</h3>
         
         {/* Description */}
-        <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+        <p className="text-sm md:text-base text-gray-400 leading-relaxed">{feature.description}</p>
         
         {/* Hover arrow */}
-        <div className={`absolute bottom-6 right-6 opacity-0 transform translate-x-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-x-0' : ''}`}>
-          <svg className="w-6 h-6 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className={`absolute bottom-4 md:bottom-6 right-4 md:right-6 opacity-0 transform translate-x-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-x-0' : ''}`}>
+          <svg className="w-5 md:w-6 h-5 md:h-6 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </div>
@@ -166,36 +166,36 @@ export default function Features() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-24 px-4">
+    <section ref={sectionRef} className="relative py-16 md:py-24 px-4">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent" />
       
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Section header */}
         <div 
-          className={`text-center mb-16 transition-all duration-700 ${
+          className={`text-center mb-12 md:mb-16 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-4 md:mb-6">
             <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
             <span className="text-blue-400 text-sm font-medium">Why XyloNet?</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4 px-4">
             Everything You Need for{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
               Stablecoins
             </span>
           </h2>
           
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto px-4">
             The complete DeFi hub for stablecoin trading, bridging, and earning — all on Arc Network.
           </p>
         </div>
 
         {/* Features grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {features.map((feature, index) => (
             <FeatureCard key={feature.title} feature={feature} index={index} />
           ))}

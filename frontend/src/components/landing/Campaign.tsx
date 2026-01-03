@@ -298,46 +298,46 @@ export default function Campaign() {
   };
 
   return (
-    <section ref={sectionRef} className="relative py-24 px-4" id="campaign">
+    <section ref={sectionRef} className="relative py-16 md:py-24 px-4" id="campaign">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent" />
       
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Section header */}
         <div 
-          className={`text-center mb-12 transition-all duration-700 ${
+          className={`text-center mb-8 md:mb-12 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-4 md:mb-6">
             <span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
             <span className="text-purple-400 text-sm font-medium">XyloNet Campaign</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 md:mb-4 px-4">
             Complete Tasks.{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">
               Earn XP.
             </span>
           </h2>
           
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto px-4">
             Join the XyloNet community and earn points for completing tasks. Climb the leaderboard and get rewarded!
           </p>
         </div>
 
         {/* User stats card */}
         <div 
-          className={`mb-8 transition-all duration-700 delay-200 ${
+          className={`mb-6 md:mb-8 transition-all duration-700 delay-200 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
           <div className="relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-30" />
-            <div className="relative bg-[#0d0e12] border border-white/10 rounded-2xl p-6">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-xl md:rounded-2xl blur opacity-30" />
+            <div className="relative bg-[#0d0e12] border border-white/10 rounded-xl md:rounded-2xl p-4 md:p-6">
               {!isConnected ? (
                 <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="text-gray-400 text-center">
+                  <div className="text-gray-400 text-center text-sm md:text-base">
                     Connect your wallet to start earning XP
                   </div>
                   <ConnectButton />
@@ -347,39 +347,41 @@ export default function Campaign() {
                   <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-2xl font-bold text-white">
-                      {user?.total_points || 0}
+                <div className="flex flex-col gap-4 md:gap-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-xl md:text-2xl font-bold text-white flex-shrink-0">
+                        {user?.total_points || 0}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xl md:text-2xl font-bold text-white truncate">
+                          {user?.total_points || 0} <span className="text-yellow-400">XP</span>
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-400 truncate">
+                          {address?.slice(0, 6)}...{address?.slice(-4)}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-2xl font-bold text-white">
-                        {user?.total_points || 0} <span className="text-yellow-400">XP</span>
+                    
+                    <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto justify-around sm:justify-end">
+                      <div className="text-center">
+                        <div className="text-lg md:text-xl font-bold text-white">
+                          #{userRank || '-'}
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-400">Rank</div>
                       </div>
-                      <div className="text-sm text-gray-400">
-                        {address?.slice(0, 6)}...{address?.slice(-4)}
+                      <div className="text-center">
+                        <div className="text-lg md:text-xl font-bold text-white">
+                          {completions.length}/{tasks.length}
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-400">Tasks</div>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-6">
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-white">
-                        #{userRank || '-'}
+                      <div className="text-center">
+                        <div className="text-lg md:text-xl font-bold text-white">
+                          {totalUsers}
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-400">Users</div>
                       </div>
-                      <div className="text-sm text-gray-400">Rank</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-white">
-                        {completions.length}/{tasks.length}
-                      </div>
-                      <div className="text-sm text-gray-400">Tasks Done</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-white">
-                        {totalUsers}
-                      </div>
-                      <div className="text-sm text-gray-400">Participants</div>
                     </div>
                   </div>
                 </div>
@@ -390,13 +392,13 @@ export default function Campaign() {
 
         {/* Tabs */}
         <div 
-          className={`flex gap-4 mb-6 transition-all duration-700 delay-300 ${
+          className={`flex gap-2 md:gap-4 mb-4 md:mb-6 overflow-x-auto transition-all duration-700 delay-300 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
           <button
             onClick={() => setShowLeaderboard(false)}
-            className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+            className={`flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl font-medium text-sm md:text-base whitespace-nowrap transition-all duration-200 ${
               !showLeaderboard 
                 ? 'bg-white/10 text-white border border-white/20' 
                 : 'text-gray-400 hover:text-white'
@@ -406,13 +408,13 @@ export default function Campaign() {
           </button>
           <button
             onClick={() => setShowLeaderboard(true)}
-            className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
+            className={`flex-1 sm:flex-none px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl font-medium text-sm md:text-base whitespace-nowrap transition-all duration-200 flex items-center justify-center gap-2 ${
               showLeaderboard 
                 ? 'bg-white/10 text-white border border-white/20' 
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor">
+            <svg viewBox="0 0 24 24" className="w-4 md:w-5 h-4 md:h-5" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             Leaderboard
