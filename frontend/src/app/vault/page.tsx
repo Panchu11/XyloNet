@@ -158,12 +158,14 @@ export default function VaultPage() {
 
   const handleApprove = () => {
     if (!depositAmount) return
-    toastIdRef.current = pending('Approving USDC...', 'Please confirm in your wallet')
+    // Approve MAX to vault - "Approve once, deposit forever"
+    const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+    toastIdRef.current = pending('Approving USDC...', 'One-time approval for vault!')
     writeApprove({
       address: TOKENS.USDC.address,
       abi: ERC20_ABI,
       functionName: 'approve',
-      args: [CONTRACTS.VAULT, parseUnits(depositAmount, 6)],
+      args: [CONTRACTS.VAULT, MAX_UINT256],
     })
   }
 
@@ -193,14 +195,11 @@ export default function VaultPage() {
   const userSharesFormatted = formatUnits((userShares as bigint) ?? ZERO, 18)
   const userAssetsValue = Number(formatUnits((previewWithdrawAmount as bigint) ?? ZERO, 6))
   
-  // Calculate real APY based on vault performance
-  // For a real implementation, you'd track historical data
-  // Here we estimate based on typical stable yield strategies
-  const baseApy = 4.2 // Base yield from staking/lending
-  const performanceFee = 0.15 // 15% performance fee
-  const liquidityBonus = tvl > 10000 ? 1.5 : tvl > 1000 ? 0.8 : 0.3 // Bonus based on TVL
-  const apy = Math.min(baseApy + liquidityBonus, 8.5) * (1 - performanceFee) // Cap at 8.5% pre-fee
-  const apyFormatted = apy.toFixed(2) // Format to 2 decimal places
+  // Calculate estimated APY based on vault metrics
+  // In production, this would track historical share price growth
+  // For testnet, we show estimated yield based on DeFi typical rates
+  const estimatedApy = tvl > 0 ? Math.min(4.5 + (tvl / 100000) * 2, 8.0) : 0
+  const apyFormatted = estimatedApy.toFixed(1)
 
   return (
     <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">

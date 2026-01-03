@@ -215,13 +215,14 @@ export function SwapWidget({ className }: SwapWidgetProps) {
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 1200) // 20 minutes
     
     if (needsApproval) {
-      // Approve first
-      toastIdRef.current = pending('Approving ' + TOKENS[tokenIn].symbol + '...', 'Please confirm in your wallet')
+      // Approve MAX to router - "Approve once, swap forever"
+      const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+      toastIdRef.current = pending('Approving ' + TOKENS[tokenIn].symbol + '...', 'One-time approval - swap forever!')
       writeApprove({
         address: TOKENS[tokenIn].address,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [CONTRACTS.ROUTER, amountInWei],
+        args: [CONTRACTS.ROUTER, MAX_UINT256],
       })
     } else {
       // Execute swap - pass as struct (tuple)
