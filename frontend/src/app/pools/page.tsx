@@ -343,27 +343,68 @@ export default function PoolsPage() {
     return '0'
   }
 
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
+      })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 relative overflow-hidden">
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 bg-[#050507]">
+        <div 
+          className="absolute w-[1100px] h-[1100px] rounded-full opacity-20 blur-[150px] transition-all duration-700"
+          style={{
+            background: 'radial-gradient(circle, rgba(16,185,129,0.8) 0%, rgba(5,150,105,0.4) 50%, transparent 70%)',
+            top: `calc(${mousePosition.y * 100}% - 550px)`,
+            left: `calc(${mousePosition.x * 100}% - 550px)`,
+          }}
+        />
+        <div 
+          className="absolute w-[900px] h-[900px] rounded-full opacity-15 blur-[120px] transition-all duration-1000"
+          style={{
+            background: 'radial-gradient(circle, rgba(34,197,94,0.6) 0%, rgba(22,163,74,0.3) 60%, transparent 70%)',
+            bottom: `calc(${(1-mousePosition.y) * 80}% - 450px)`,
+            right: `calc(${(1-mousePosition.x) * 80}% - 450px)`,
+          }}
+        />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }} />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-            <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] bg-clip-text text-transparent">
-              Liquidity Pools
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 glass-premium border border-emerald-500/20 rounded-full px-4 py-2 mb-6 magnetic-hover">
+            <Droplets className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span className="text-emerald-400 font-medium text-sm">Advanced LP Management</span>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="block text-white mb-2">Provide Liquidity</span>
+            <span className="relative inline-block">
+              <span className="relative z-10 bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 text-transparent bg-clip-text animate-gradient-flow" style={{ backgroundSize: '200% 200%' }}>
+                Earn Passive Income
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-green-400 to-teal-400 rounded-full blur-sm animate-expand" />
             </span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm sm:text-lg max-w-xl mx-auto px-2">
-            Provide liquidity to earn swap fees. Optimized StableSwap curve for minimal slippage.
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto px-2">
+            Earn <span className="text-emerald-400 font-semibold">0.04% fees</span> on every swap.{' '}
+            <span className="text-green-400 font-semibold">StableSwap</span> curve minimizes impermanent loss.
           </p>
         </div>
 

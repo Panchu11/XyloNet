@@ -24,6 +24,18 @@ export default function HistoryPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'swap' | 'liquidity' | 'vault' | 'bridge'>('all')
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
+      })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
   const handleLoadTransactions = () => {
     const localTxs = loadTransactions()
@@ -203,24 +215,52 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/10 rounded-full blur-3xl" />
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 relative overflow-hidden">
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 bg-[#050507]">
+        <div 
+          className="absolute w-[1000px] h-[1000px] rounded-full opacity-20 blur-[150px] transition-all duration-700"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.8) 0%, rgba(79,70,229,0.4) 50%, transparent 70%)',
+            top: `calc(${mousePosition.y * 100}% - 500px)`,
+            left: `calc(${mousePosition.x * 100}% - 500px)`,
+          }}
+        />
+        <div 
+          className="absolute w-[800px] h-[800px] rounded-full opacity-15 blur-[120px] transition-all duration-1000"
+          style={{
+            background: 'radial-gradient(circle, rgba(129,140,248,0.6) 0%, rgba(99,102,241,0.3) 60%, transparent 70%)',
+            bottom: `calc(${(1-mousePosition.y) * 80}% - 400px)`,
+            right: `calc(${(1-mousePosition.x) * 80}% - 400px)`,
+          }}
+        />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }} />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col gap-4 mb-6 sm:mb-8">
+        <div className="flex flex-col gap-4 mb-6 sm:mb-8 animate-fade-in-up">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2">
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Transaction History
+            <div className="inline-flex items-center gap-2 glass-premium border border-indigo-500/20 rounded-full px-4 py-2 mb-4 magnetic-hover">
+              <History className="w-4 h-4 text-indigo-400" />
+              <span className="text-indigo-400 font-medium text-sm">Transaction Explorer</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">
+              <span className="relative inline-block">
+                <span className="relative z-10 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                  Transaction History
+                </span>
+                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-full blur-sm opacity-50" />
               </span>
             </h1>
-            <p className="text-[var(--text-secondary)] text-sm sm:text-base">
-              View your recent swaps, liquidity, and vault transactions
+            <p className="text-gray-400 text-sm sm:text-base">
+              Track all your <span className="text-indigo-400 font-semibold">swaps</span>,{' '}
+              <span className="text-purple-400 font-semibold">liquidity</span>, and{' '}
+              <span className="text-pink-400 font-semibold">vault</span> transactions
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

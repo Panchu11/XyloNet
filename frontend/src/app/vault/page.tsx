@@ -220,27 +220,71 @@ export default function VaultPage() {
   const estimatedApy = tvl > 0 ? Math.min(4.5 + (tvl / 100000) * 2, 8.0) : 0
   const apyFormatted = estimatedApy.toFixed(1)
 
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
+      })
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 bg-[var(--background)]">
+    <div className="min-h-[calc(100vh-4rem)] px-3 sm:px-4 py-6 sm:py-12 relative overflow-hidden">
       {/* Confetti celebration */}
       <Confetti isActive={showConfetti} />
       
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--primary)]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--secondary)]/10 rounded-full blur-3xl" />
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 bg-[#050507]">
+        <div 
+          className="absolute w-[1000px] h-[1000px] rounded-full opacity-20 blur-[150px] transition-all duration-700"
+          style={{
+            background: 'radial-gradient(circle, rgba(139,92,246,0.8) 0%, rgba(124,58,237,0.4) 50%, transparent 70%)',
+            top: `calc(${mousePosition.y * 100}% - 500px)`,
+            left: `calc(${mousePosition.x * 100}% - 500px)`,
+          }}
+        />
+        <div 
+          className="absolute w-[800px] h-[800px] rounded-full opacity-15 blur-[120px] transition-all duration-1000"
+          style={{
+            background: 'radial-gradient(circle, rgba(168,85,247,0.6) 0%, rgba(147,51,234,0.3) 60%, transparent 70%)',
+            bottom: `calc(${(1-mousePosition.y) * 80}% - 400px)`,
+            right: `calc(${(1-mousePosition.x) * 80}% - 400px)`,
+          }}
+        />
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }} />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-            <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--secondary)] to-[var(--accent)] bg-clip-text text-transparent">
-              USDC Yield Vault
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 glass-premium border border-purple-500/20 rounded-full px-4 py-2 mb-6 magnetic-hover">
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+            </div>
+            <span className="text-purple-400 font-medium text-sm">Auto-Compounding Vault</span>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="block text-white mb-2">USDC Yield Vault</span>
+            <span className="relative inline-block">
+              <span className="relative z-10 bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 text-transparent bg-clip-text animate-gradient-flow" style={{ backgroundSize: '200% 200%' }}>
+                Maximize Your Returns
+              </span>
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 rounded-full blur-sm animate-expand" />
             </span>
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm sm:text-lg max-w-xl mx-auto px-2">
-            Deposit USDC to earn yield. Auto-compounding strategy optimized for Arc Network.
+          <p className="text-lg text-gray-400 max-w-xl mx-auto px-2">
+            Deposit USDC to earn <span className="text-purple-400 font-semibold">{apyFormatted}% APY</span>.{' '}
+            <span className="text-violet-400 font-semibold">Fully automated</span> compounding strategy.
           </p>
         </div>
 
