@@ -1,15 +1,49 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useReadContracts } from 'wagmi'
+import { formatUnits } from 'viem'
 import { SwapWidget } from '@/components/swap/SwapWidget'
-import { ArrowRight, Zap, DollarSign, Globe, TrendingUp, Activity, Clock, Shield } from 'lucide-react'
+import { ArrowRight, Zap, DollarSign, Globe, TrendingUp, Activity, Clock, Shield, Droplets } from 'lucide-react'
 import Link from 'next/link'
 import { TiltCard } from '@/components/ui/TiltCard'
+import { CONTRACTS } from '@/config/constants'
+import { XYLO_POOL_ABI } from '@/config/abis'
+import { formatNumber } from '@/lib/utils'
 
 export default function SwapPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
   const [currentPrice, setCurrentPrice] = useState(0.92)
   const [priceHistory, setPriceHistory] = useState<number[]>([0.918, 0.920, 0.919, 0.921, 0.920])
+
+  // Fetch real pool data for TVL
+  const { data: poolData } = useReadContracts({
+    contracts: [
+      {
+        address: CONTRACTS.USDC_EURC_POOL,
+        abi: XYLO_POOL_ABI,
+        functionName: 'getReserves',
+      },
+      {
+        address: CONTRACTS.USDC_USYC_POOL,
+        abi: XYLO_POOL_ABI,
+        functionName: 'getReserves',
+      },
+    ],
+  })
+
+  // Calculate real TVL from pool reserves
+  let totalTVL = 0
+  if (poolData) {
+    if (poolData[0]?.result) {
+      const [r0, r1] = poolData[0].result as [bigint, bigint]
+      totalTVL += Number(formatUnits(r0, 6)) + Number(formatUnits(r1, 6))
+    }
+    if (poolData[1]?.result) {
+      const [r0, r1] = poolData[1].result as [bigint, bigint]
+      totalTVL += Number(formatUnits(r0, 6)) + Number(formatUnits(r1, 6))
+    }
+  }
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -148,31 +182,32 @@ export default function SwapPage() {
         <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-4xl stagger-fade">
           <StatCard
             icon={<DollarSign className="w-5 h-5" />}
-            label="Avg. Fee"
-            value="$0.01"
-            change="+0%"
+            label="Avg. Gas Fee"
+            value="~$0.01"
+            change="Arc Network"
             gradient="from-green-500 to-emerald-500"
           />
           <StatCard
             icon={<Zap className="w-5 h-5" />}
             label="Finality"
             value="<350ms"
-            change="Fast"
+            change="Instant"
             gradient="from-yellow-500 to-orange-500"
           />
           <StatCard
             icon={<TrendingUp className="w-5 h-5" />}
             label="Swap Fee"
             value="0.04%"
-            change="Low"
+            change="4 bps"
             gradient="from-blue-500 to-cyan-500"
           />
           <StatCard
-            icon={<Activity className="w-5 h-5" />}
-            label="24h Volume"
-            value="$1.2M"
-            change="+12%"
+            icon={<Droplets className="w-5 h-5" />}
+            label="Pool TVL"
+            value={totalTVL > 0 ? `$${formatNumber(totalTVL)}` : '$0'}
+            change="Live"
             gradient="from-purple-500 to-pink-500"
+            isLive={true}
           />
         </div>
       </section>
@@ -273,14 +308,19 @@ function MiniSparkline({ data }: { data: number[] }) {
   )
 }
 
-function StatCard({ icon, label, value, change, gradient }: { icon: React.ReactNode; label: string; value: string; change: string; gradient: string }) {
+function StatCard({ icon, label, value, change, gradient, isLive }: { icon: React.ReactNode; label: string; value: string; change: string; gradient: string; isLive?: boolean }) {
   return (
     <TiltCard tiltAmount={6}>
       <div className="glass-premium rounded-xl p-4 h-full holographic group hover:border-white/20 transition-all">
         <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 text-white depth-shadow group-hover:scale-110 transition-transform`}>
           {icon}
         </div>
-        <div className="text-xs text-gray-400 mb-1">{label}</div>
+        <div className="text-xs text-gray-400 mb-1 flex items-center gap-1">
+          {label}
+          {isLive && (
+            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+          )}
+        </div>
         <div className="text-xl md:text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent mb-1">
           {value}
         </div>
