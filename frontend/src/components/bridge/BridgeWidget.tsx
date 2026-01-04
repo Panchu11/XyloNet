@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useAccount, useBalance, useConnectorClient } from 'wagmi'
-import { ArrowRight, ChevronDown, Loader2, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
+import { useAccount, useBalance } from 'wagmi'
+import { ArrowRight, ChevronDown, Loader2, ExternalLink, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 import { BridgeKit } from '@circle-fin/bridge-kit'
 import { createAdapterFromProvider } from '@circle-fin/adapter-viem-v2'
 import { TOKENS } from '@/config/constants'
@@ -10,7 +10,6 @@ import { cn, formatNumber } from '@/lib/utils'
 import { useTxToast } from '@/components/ui/Toast'
 import { ChainLogo } from '@/components/ui/TokenLogos'
 import { Confetti } from '@/components/ui/Confetti'
-import { StepIndicator } from '@/components/ui/EmptyState'
 import { saveTransaction } from '@/lib/transactions'
 
 // Bridge Kit supported chains for Arc Testnet
@@ -34,8 +33,7 @@ interface BridgeStep {
 }
 
 export function BridgeWidget() {
-  const { address, isConnected } = useAccount()
-  const { data: client } = useConnectorClient()
+  const { address, isConnected, connector } = useAccount()
   const { pending, success, error: errorToast } = useTxToast()
   
   const [sourceChain] = useState<BridgeChain>(BRIDGE_CHAINS[0]) // Arc Testnet as source (fixed)
@@ -48,22 +46,44 @@ export function BridgeWidget() {
   const [steps, setSteps] = useState<BridgeStep[]>([])
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [eip1193Provider, setEip1193Provider] = useState<any>(null)
 
   // User USDC balance
   const { data: usdcBalance } = useBalance({ address, token: TOKENS.USDC.address })
 
-  // Create Bridge Kit adapter from wagmi client
+  // Get EIP1193 provider from connector
+  useEffect(() => {
+    const getProvider = async () => {
+      if (connector && isConnected) {
+        try {
+          const provider = await connector.getProvider()
+          setEip1193Provider(provider)
+        } catch (err) {
+          console.error('Failed to get provider:', err)
+          setEip1193Provider(null)
+        }
+      } else {
+        setEip1193Provider(null)
+      }
+    }
+    getProvider()
+  }, [connector, isConnected])
+
+  // Create Bridge Kit adapter from EIP1193 provider
   const createAdapter = useCallback(async () => {
-    if (!client?.transport) return null
+    if (!eip1193Provider) {
+      console.error('No EIP1193 provider available')
+      return null
+    }
     try {
-      const provider = (client.transport as any)?.value?.provider || client.transport
-      const adapter = await createAdapterFromProvider({ provider })
+      const adapter = await createAdapterFromProvider({ provider: eip1193Provider })
       return adapter
     } catch (err) {
       console.error('Failed to create adapter:', err)
       return null
     }
-  }, [client])
+  }, [eip1193Provider])
 
   const handleBridge = async () => {
     if (!isConnected || !amount || !address) return
@@ -170,30 +190,76 @@ export function BridgeWidget() {
 
     } catch (err: any) {
       console.error('Bridge error:', err)
+      const errorMessage = err.message || 'Unknown error'
       
-      // Check if this is an RPC parsing error (bridge may have succeeded)
-      const isRpcError = err.message?.includes('JSON') || 
-                        err.message?.includes('HTTP request failed') ||
-                        err.message?.includes('Unterminated string')
+      // Check if this is an RPC/network error (bridge may have succeeded)
+      const isRpcError = errorMessage.includes('JSON') || 
+                        errorMessage.includes('HTTP request failed') ||
+                        errorMessage.includes('Unterminated string') ||
+                        errorMessage.includes('request failed')
       
-      // Check which steps completed successfully
-      const burnCompleted = steps.some(s => s.name === 'burn' && s.state === 'success')
-      const attestationCompleted = steps.some(s => s.name === 'fetchAttestation' && s.state === 'success')
+      // Check if this is a timeout error
+      const isTimeoutError = errorMessage.includes('Maximum retry attempts') ||
+                            errorMessage.includes('Request timed out') ||
+                            errorMessage.includes('timeout')
       
-      if (isRpcError && (burnCompleted || attestationCompleted)) {
-        // Bridge likely succeeded, just RPC verification failed
-        const warningMsg = 'Bridge transaction submitted successfully! The mint may take 30-60 seconds. Check your destination wallet or explorer to confirm receipt.'
+      // Get current step states
+      const currentSteps = steps
+      const burnCompleted = currentSteps.some(s => s.name === 'burn' && (s.state === 'success' || s.state === 'in_progress'))
+      const attestationCompleted = currentSteps.some(s => s.name === 'fetchAttestation' && s.state === 'success')
+      const burnTxHash = currentSteps.find(s => s.name === 'burn')?.txHash
+      
+      if ((isRpcError || isTimeoutError) && burnCompleted && burnTxHash) {
+        // Burn transaction went through, bridge is likely processing
+        const warningMsg = `Bridge transaction submitted! Burn tx: ${burnTxHash.slice(0, 10)}... 
+
+The mint may take 1-2 minutes. Your USDC will arrive on ${destChain.name} automatically.
+
+If you don't receive it within 5 minutes, check Sepolia Etherscan with your address.`
         setErrorMsg(warningMsg)
-        success(toastId, 'Bridge Submitted!', steps.find(s => s.txHash)?.txHash || '')
+        success(toastId, 'Bridge Submitted!', burnTxHash)
+        setRetryCount(0)
         
-        // Mark mint as pending (not error)
+        // Save as pending transaction
+        saveTransaction({
+          hash: burnTxHash,
+          type: 'bridge',
+          timestamp: Date.now(),
+          tokenIn: 'USDC',
+          tokenOut: 'USDC',
+          amountIn: amount,
+          amountOut: amount,
+          status: 'pending',
+        })
+        
+        // Mark remaining steps as pending
         setSteps(prev => prev.map(step => 
-          step.name === 'mint' ? { ...step, state: 'pending' } : step
+          step.state === 'in_progress' || step.state === 'error' 
+            ? { ...step, state: 'pending' } 
+            : step
         ))
+        setAmount('')
+      } else if (isTimeoutError && retryCount < 2) {
+        // Allow retry for timeout errors if burn hasn't started
+        setRetryCount(prev => prev + 1)
+        setErrorMsg(`Network timeout (attempt ${retryCount + 1}/3). The Sepolia network may be congested. Click "Bridge" to retry.`)
+        errorToast(toastId, 'Network Timeout', 'Please retry')
+        
+        // Reset steps to pending
+        setSteps([
+          { name: 'approve', state: 'pending' },
+          { name: 'burn', state: 'pending' },
+          { name: 'fetchAttestation', state: 'pending' },
+          { name: 'mint', state: 'pending' },
+        ])
+      } else if (errorMessage.includes('wallet adapter')) {
+        // Wallet adapter error - suggest reconnect
+        setErrorMsg('Unable to connect to your wallet. Please disconnect and reconnect your wallet, then try again.')
+        errorToast(toastId, 'Wallet Error', 'Please reconnect wallet')
       } else {
-        // Actual bridge failure
-        setErrorMsg(err.message || 'Bridge failed. Please try again.')
-        errorToast(toastId, 'Bridge Failed', err.message || 'Transaction failed')
+        // Other errors
+        setErrorMsg(errorMessage)
+        errorToast(toastId, 'Bridge Failed', errorMessage.slice(0, 100))
         
         // Mark current step as error
         setSteps(prev => prev.map(step => 
@@ -261,23 +327,58 @@ export function BridgeWidget() {
         {errorMsg && (
           <div className={cn(
             "mb-4 p-4 border rounded-lg",
-            errorMsg.includes('submitted successfully')
+            errorMsg.includes('submitted') || errorMsg.includes('Burn tx:')
               ? "bg-yellow-500/10 border-yellow-500/30"
               : "bg-red-500/10 border-red-500/30"
           )}>
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-3">
               <AlertCircle className={cn(
-                "w-6 h-6",
-                errorMsg.includes('submitted successfully') ? "text-yellow-400" : "text-red-400"
+                "w-6 h-6 flex-shrink-0 mt-0.5",
+                errorMsg.includes('submitted') || errorMsg.includes('Burn tx:') ? "text-yellow-400" : "text-red-400"
               )} />
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className={cn(
                   "font-medium",
-                  errorMsg.includes('submitted successfully') ? "text-yellow-400" : "text-red-400"
+                  errorMsg.includes('submitted') || errorMsg.includes('Burn tx:') ? "text-yellow-400" : "text-red-400"
                 )}>
-                  {errorMsg.includes('submitted successfully') ? 'Bridge Submitted - Awaiting Confirmation' : 'Bridge Failed'}
+                  {errorMsg.includes('submitted') || errorMsg.includes('Burn tx:') 
+                    ? 'Bridge Submitted - Processing' 
+                    : errorMsg.includes('timeout') || errorMsg.includes('Timeout')
+                      ? 'Network Timeout'
+                      : 'Bridge Failed'}
                 </p>
-                <p className="text-sm text-[var(--text-secondary)]">{errorMsg}</p>
+                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-line mt-1">{errorMsg}</p>
+                
+                {/* Action buttons */}
+                <div className="flex gap-2 mt-3">
+                  {(errorMsg.includes('submitted') || errorMsg.includes('Burn tx:')) && (
+                    <a
+                      href={`https://sepolia.etherscan.io/address/${address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 text-xs rounded-lg transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Check Etherscan
+                    </a>
+                  )}
+                  <button
+                    onClick={() => {
+                      setErrorMsg(null)
+                      setBridgeResult(null)
+                      if (!errorMsg.includes('submitted') && !errorMsg.includes('Burn tx:')) {
+                        setSteps([
+                          { name: 'approve', state: 'pending' },
+                          { name: 'burn', state: 'pending' },
+                          { name: 'fetchAttestation', state: 'pending' },
+                          { name: 'mint', state: 'pending' },
+                        ])
+                      }
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[var(--card-border)] hover:bg-[var(--card-bg)] text-[var(--text-secondary)] text-xs rounded-lg transition-colors"
+                  >
+                    {errorMsg.includes('submitted') || errorMsg.includes('Burn tx:') ? 'Dismiss' : <><RefreshCw className="w-3 h-3" /> Try Again</>}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
