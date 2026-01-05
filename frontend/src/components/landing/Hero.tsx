@@ -121,7 +121,7 @@ function useProtocolStats() {
     fetchUsers();
   }, []);
 
-  // Fetch REAL swap volume from Swap events
+  // Fetch REAL swap volume from Swap events (in chunks due to RPC limit)
   useEffect(() => {
     async function fetchSwapVolume() {
       if (!publicClient) return;
@@ -130,56 +130,71 @@ function useProtocolStats() {
         setIsLoadingVolume(true);
         let totalSwapVolume = 0;
         
-        // Get current block number to determine range
+        // Get current block
         const currentBlock = await publicClient.getBlockNumber();
-        // Start from block 0 or a reasonable starting point (most RPCs support this)
-        const fromBlock = BigInt(0);
         
-        // Query Swap events from USDC-EURC pool
+        // Arc RPC limits eth_getLogs to 10,000 blocks per query
+        const CHUNK_SIZE = 10000n;
+        const fromBlock = currentBlock - 100000n; // Last ~100k blocks (~30 days at 3s/block)
+        
+        console.log('Querying from block:', fromBlock.toString(), 'to', currentBlock.toString());
+        
+        // Query USDC-EURC pool in chunks
         try {
-          const pool1Logs = await publicClient.getLogs({
-            address: CONTRACTS.USDC_EURC_POOL,
-            event: SWAP_EVENT_ABI,
-            fromBlock: fromBlock,
-            toBlock: currentBlock,
-          });
-          
-          // Sum up amountIn from pool 1 (USDC decimals = 6)
-          pool1Logs.forEach((log) => {
-            const amountIn = log.args.amountIn as bigint;
-            if (amountIn) {
-              totalSwapVolume += Number(formatUnits(amountIn, 6));
-            }
-          });
-          console.log('Pool 1 swap events:', pool1Logs.length, 'Total:', totalSwapVolume);
+          let pool1Volume = 0;
+          for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+            const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+            
+            const logs = await publicClient.getLogs({
+              address: CONTRACTS.USDC_EURC_POOL,
+              event: SWAP_EVENT_ABI,
+              fromBlock: start,
+              toBlock: end,
+            });
+            
+            logs.forEach((log) => {
+              const amountIn = log.args.amountIn as bigint;
+              if (amountIn) {
+                pool1Volume += Number(formatUnits(amountIn, 6));
+              }
+            });
+          }
+          totalSwapVolume += pool1Volume;
+          console.log('Pool 1 swap volume:', pool1Volume);
         } catch (e) {
           console.error('Failed to fetch pool 1 logs:', e);
         }
         
-        // Query Swap events from USDC-USYC pool
+        // Query USDC-USYC pool in chunks
         try {
-          const pool2Logs = await publicClient.getLogs({
-            address: CONTRACTS.USDC_USYC_POOL,
-            event: SWAP_EVENT_ABI,
-            fromBlock: fromBlock,
-            toBlock: currentBlock,
-          });
-          
-          // Sum up amountIn from pool 2 (USDC decimals = 6)
-          pool2Logs.forEach((log) => {
-            const amountIn = log.args.amountIn as bigint;
-            if (amountIn) {
-              totalSwapVolume += Number(formatUnits(amountIn, 6));
-            }
-          });
-          console.log('Pool 2 swap events:', pool2Logs.length, 'Total:', totalSwapVolume);
+          let pool2Volume = 0;
+          for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+            const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+            
+            const logs = await publicClient.getLogs({
+              address: CONTRACTS.USDC_USYC_POOL,
+              event: SWAP_EVENT_ABI,
+              fromBlock: start,
+              toBlock: end,
+            });
+            
+            logs.forEach((log) => {
+              const amountIn = log.args.amountIn as bigint;
+              if (amountIn) {
+                pool2Volume += Number(formatUnits(amountIn, 6));
+              }
+            });
+          }
+          totalSwapVolume += pool2Volume;
+          console.log('Pool 2 swap volume:', pool2Volume);
         } catch (e) {
           console.error('Failed to fetch pool 2 logs:', e);
         }
         
         setSwapVolume(totalSwapVolume);
+        console.log('Total swap volume:', totalSwapVolume);
       } catch (e) {
-        console.error('Failed to fetch swap volume from events:', e);
+        console.error('Failed to fetch swap volume:', e);
       } finally {
         setIsLoadingVolume(false);
       }

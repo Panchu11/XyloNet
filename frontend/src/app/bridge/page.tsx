@@ -45,7 +45,7 @@ export default function BridgePage() {
     functionName: 'getStats',
   })
 
-  // Fetch REAL bridge data from Circle's TokenMessenger events
+  // Fetch REAL bridge data from Circle's TokenMessenger events (in chunks)
   useEffect(() => {
     async function fetchBridgeVolume() {
       if (!publicClient) return;
@@ -57,27 +57,33 @@ export default function BridgePage() {
         
         // Get current block
         const currentBlock = await publicClient.getBlockNumber();
-        const fromBlock = BigInt(0);
+        const CHUNK_SIZE = 10000n;
+        const fromBlock = currentBlock - 100000n; // Last ~100k blocks
         
-        // Query DepositForBurn events from Circle's TokenMessenger
-        // This captures ALL bridges through Circle CCTP on Arc
+        console.log('Querying bridge events from block:', fromBlock.toString(), 'to', currentBlock.toString());
+        
+        // Query DepositForBurn events in chunks
         try {
-          const logs = await publicClient.getLogs({
-            address: CONTRACTS.TOKEN_MESSENGER,
-            event: DEPOSIT_FOR_BURN_EVENT,
-            fromBlock: fromBlock,
-            toBlock: currentBlock,
-          });
+          for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+            const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+            
+            const logs = await publicClient.getLogs({
+              address: CONTRACTS.TOKEN_MESSENGER,
+              event: DEPOSIT_FOR_BURN_EVENT,
+              fromBlock: start,
+              toBlock: end,
+            });
+            
+            logs.forEach((log) => {
+              const amount = log.args.amount as bigint;
+              if (amount) {
+                totalVolume += Number(formatUnits(amount, 6));
+                totalCount++;
+              }
+            });
+          }
           
-          logs.forEach((log) => {
-            const amount = log.args.amount as bigint;
-            if (amount) {
-              totalVolume += Number(formatUnits(amount, 6));
-              totalCount++;
-            }
-          });
-          
-          console.log('Circle bridge events:', logs.length, 'Volume:', totalVolume);
+          console.log('Circle bridge events:', totalCount, 'Volume:', totalVolume);
         } catch (e) {
           console.error('Failed to fetch Circle bridge logs:', e);
         }
