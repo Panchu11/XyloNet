@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useReadContract } from 'wagmi'
-import { formatUnits } from 'viem'
+import { useReadContract, usePublicClient } from 'wagmi'
+import { formatUnits, parseAbiItem } from 'viem'
 import { BridgeWidget } from '@/components/bridge/BridgeWidget'
 import { TiltCard } from '@/components/ui/TiltCard'
 import { Lock, Zap, Globe, ArrowRight, Network, Timer, CheckCircle2, Sparkles, TrendingUp, Activity } from 'lucide-react'
-import { CONTRACTS } from '@/config/constants'
+import { CONTRACTS, ARC_NETWORK } from '@/config/constants'
 import { loadTransactions } from '@/lib/transactions'
 import { formatNumber } from '@/lib/utils'
 
-// Bridge ABI for stats
+// Circle TokenMessenger DepositForBurn event for tracking real bridge volume
+const DEPOSIT_FOR_BURN_EVENT = parseAbiItem('event DepositForBurn(uint64 indexed nonce, address indexed burnToken, uint256 amount, address indexed depositor, bytes32 mintRecipient, uint32 destinationDomain, bytes32 destinationTokenMessenger, bytes32 destinationCaller)')
+
+// Bridge ABI for stats (backup)
 const BRIDGE_ABI = [
   {
     inputs: [],
@@ -28,22 +31,75 @@ const BRIDGE_ABI = [
 export default function BridgePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
   const [activeChain, setActiveChain] = useState(0)
+  const publicClient = usePublicClient({ chainId: ARC_NETWORK.chainId })
 
-  // Read real bridge stats from contract
+  // State for real bridge stats from Circle's contract events
+  const [realBridgeVolume, setRealBridgeVolume] = useState(0)
+  const [realBridgeCount, setRealBridgeCount] = useState(0)
+  const [isLoadingStats, setIsLoadingStats] = useState(true)
+
+  // Read bridge stats from our contract (backup)
   const { data: bridgeStats } = useReadContract({
     address: CONTRACTS.BRIDGE,
     abi: BRIDGE_ABI,
     functionName: 'getStats',
   })
 
-  // Calculate real stats from blockchain + localStorage
-  const totalBridgedIn = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[0], 6)) : 0
-  const totalBridgedOut = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[1], 6)) : 0
-  const onChainBridgeCount = bridgeStats ? Number((bridgeStats as [bigint, bigint, bigint])[2]) : 0
+  // Fetch REAL bridge data from Circle's TokenMessenger events
+  useEffect(() => {
+    async function fetchBridgeVolume() {
+      if (!publicClient) return;
+      
+      try {
+        setIsLoadingStats(true);
+        let totalVolume = 0;
+        let totalCount = 0;
+        
+        // Get current block
+        const currentBlock = await publicClient.getBlockNumber();
+        const fromBlock = BigInt(0);
+        
+        // Query DepositForBurn events from Circle's TokenMessenger
+        // This captures ALL bridges through Circle CCTP on Arc
+        try {
+          const logs = await publicClient.getLogs({
+            address: CONTRACTS.TOKEN_MESSENGER,
+            event: DEPOSIT_FOR_BURN_EVENT,
+            fromBlock: fromBlock,
+            toBlock: currentBlock,
+          });
+          
+          logs.forEach((log) => {
+            const amount = log.args.amount as bigint;
+            if (amount) {
+              totalVolume += Number(formatUnits(amount, 6));
+              totalCount++;
+            }
+          });
+          
+          console.log('Circle bridge events:', logs.length, 'Volume:', totalVolume);
+        } catch (e) {
+          console.error('Failed to fetch Circle bridge logs:', e);
+        }
+        
+        setRealBridgeVolume(totalVolume);
+        setRealBridgeCount(totalCount);
+      } catch (e) {
+        console.error('Failed to fetch bridge stats:', e);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+    
+    fetchBridgeVolume();
+  }, [publicClient]);
+
+  // Fallback to our contract stats if Circle query fails
+  const contractBridgedIn = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[0], 6)) : 0
+  const contractBridgedOut = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[1], 6)) : 0
+  const contractBridgeCount = bridgeStats ? Number((bridgeStats as [bigint, bigint, bigint])[2]) : 0
   
-  // Get bridge transactions from history
-  const [localBridgeCount, setLocalBridgeCount] = useState(0)
-  const [localBridgeVolume, setLocalBridgeVolume] = useState(0)
+  // Get bridge transactions from local history for additional stats
   const [avgBridgeTime, setAvgBridgeTime] = useState(0)
   const [successfulBridges, setSuccessfulBridges] = useState(0)
   const [totalBridgeAttempts, setTotalBridgeAttempts] = useState(0)
@@ -53,24 +109,16 @@ export default function BridgePage() {
     const bridgeTxs = txs.filter(tx => tx.type === 'bridge')
     const successBridges = bridgeTxs.filter(tx => tx.status === 'success')
     
-    setLocalBridgeCount(successBridges.length)
     setTotalBridgeAttempts(bridgeTxs.length)
     setSuccessfulBridges(successBridges.length)
     
-    // Calculate volume from bridge transactions
-    let volume = 0
-    successBridges.forEach(tx => {
-      if (tx.amountIn) volume += parseFloat(tx.amountIn) || 0
-    })
-    setLocalBridgeVolume(volume)
-    
-    // Average time is ~28s for CCTP attestation (realistic estimate)
+    // Average time is ~28s for CCTP attestation
     setAvgBridgeTime(successBridges.length > 0 ? 28 : 0)
   }, [])
   
-  // Combine on-chain and local data
-  const total24hVolume = Math.max(totalBridgedIn + totalBridgedOut, localBridgeVolume)
-  const totalBridges = Math.max(onChainBridgeCount, localBridgeCount)
+  // Use real Circle data, fall back to contract data
+  const totalVolume = realBridgeVolume > 0 ? realBridgeVolume : (contractBridgedIn + contractBridgedOut)
+  const totalBridges = realBridgeCount > 0 ? realBridgeCount : contractBridgeCount
   const successRate = totalBridgeAttempts > 0 
     ? Math.round((successfulBridges / totalBridgeAttempts) * 1000) / 10
     : (totalBridges > 0 ? 99.8 : 0)
@@ -237,13 +285,13 @@ export default function BridgePage() {
         {/* Live Bridge Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
           <StatPill 
-            label="24h Volume" 
-            value={total24hVolume > 0 ? `$${formatNumber(total24hVolume)}` : '$0'} 
+            label="Total Volume" 
+            value={totalVolume > 0 ? `$${formatNumber(totalVolume)}` : (isLoadingStats ? 'Loading...' : '$0')} 
             icon={<TrendingUp className="w-4 h-4" />} 
           />
           <StatPill 
             label="Total Bridges" 
-            value={totalBridges > 0 ? formatNumber(totalBridges) : '0'} 
+            value={totalBridges > 0 ? formatNumber(totalBridges) : (isLoadingStats ? '...' : '0')} 
             icon={<Activity className="w-4 h-4" />} 
           />
           <StatPill 
