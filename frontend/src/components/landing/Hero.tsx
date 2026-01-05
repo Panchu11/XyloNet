@@ -2,11 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { useReadContracts } from 'wagmi';
-import { CONTRACTS } from '@/config/constants';
-import { XYLO_POOL_ABI, XYLO_VAULT_ABI } from '@/config/abis';
-import { formatUnits } from 'viem';
-import { loadTransactions } from '@/lib/transactions';
+import { useReadContracts, usePublicClient } from 'wagmi';
+import { CONTRACTS, ARC_NETWORK } from '@/config/constants';
+import { XYLO_POOL_ABI, XYLO_VAULT_ABI, XYLO_BRIDGE_ABI } from '@/config/abis';
+import { formatUnits, parseAbiItem } from 'viem';
 
 // Animated number counter with formatting
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
@@ -68,12 +67,17 @@ function FloatingParticle({ delay, size, left, duration }: { delay: number; size
   );
 }
 
+// Swap event ABI for querying logs
+const SWAP_EVENT_ABI = parseAbiItem('event Swap(address indexed sender, address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut, address to)');
+
 // Hook to fetch real protocol stats
 function useProtocolStats() {
   const [totalUsers, setTotalUsers] = useState(0);
-  const [totalVolume, setTotalVolume] = useState(0);
+  const [swapVolume, setSwapVolume] = useState(0);
+  const [isLoadingVolume, setIsLoadingVolume] = useState(true);
+  const publicClient = usePublicClient({ chainId: ARC_NETWORK.chainId });
 
-  // Fetch on-chain data from pools and vault
+  // Fetch on-chain data from pools, vault, and bridge
   const { data: contractData } = useReadContracts({
     contracts: [
       // USDC-EURC Pool reserves
@@ -94,10 +98,16 @@ function useProtocolStats() {
         abi: XYLO_VAULT_ABI,
         functionName: 'totalAssets',
       },
+      // Bridge total bridged out (real volume data)
+      {
+        address: CONTRACTS.BRIDGE,
+        abi: XYLO_BRIDGE_ABI,
+        functionName: 'totalBridgedOut',
+      },
     ],
   });
 
-  // Fetch user count from Supabase and calculate volume from transactions
+  // Fetch user count from Supabase
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -109,23 +119,64 @@ function useProtocolStats() {
       }
     }
     fetchUsers();
-    
-    // Calculate total volume from transaction history
-    try {
-      const txs = loadTransactions();
-      let volume = 0;
-      txs.forEach(tx => {
-        if (tx.amountIn) volume += parseFloat(tx.amountIn) || 0;
-        if (tx.amountOut) volume += parseFloat(tx.amountOut) || 0;
-      });
-      setTotalVolume(volume);
-    } catch (e) {
-      console.error('Failed to calculate volume:', e);
-    }
   }, []);
 
-  // Calculate TVL from contract data
+  // Fetch REAL swap volume from Swap events
+  useEffect(() => {
+    async function fetchSwapVolume() {
+      if (!publicClient) return;
+      
+      try {
+        setIsLoadingVolume(true);
+        let totalSwapVolume = 0;
+        
+        // Query Swap events from USDC-EURC pool
+        const pool1Logs = await publicClient.getLogs({
+          address: CONTRACTS.USDC_EURC_POOL,
+          event: SWAP_EVENT_ABI,
+          fromBlock: 'earliest',
+          toBlock: 'latest',
+        });
+        
+        // Sum up amountIn from pool 1 (USDC decimals = 6)
+        pool1Logs.forEach((log) => {
+          const amountIn = log.args.amountIn as bigint;
+          if (amountIn) {
+            totalSwapVolume += Number(formatUnits(amountIn, 6));
+          }
+        });
+        
+        // Query Swap events from USDC-USYC pool
+        const pool2Logs = await publicClient.getLogs({
+          address: CONTRACTS.USDC_USYC_POOL,
+          event: SWAP_EVENT_ABI,
+          fromBlock: 'earliest',
+          toBlock: 'latest',
+        });
+        
+        // Sum up amountIn from pool 2 (USDC decimals = 6)
+        pool2Logs.forEach((log) => {
+          const amountIn = log.args.amountIn as bigint;
+          if (amountIn) {
+            totalSwapVolume += Number(formatUnits(amountIn, 6));
+          }
+        });
+        
+        setSwapVolume(totalSwapVolume);
+      } catch (e) {
+        console.error('Failed to fetch swap volume from events:', e);
+      } finally {
+        setIsLoadingVolume(false);
+      }
+    }
+    
+    fetchSwapVolume();
+  }, [publicClient]);
+
+  // Calculate TVL and Total Volume from contract data
   let tvl = 0;
+  let bridgeVolume = 0;
+  
   if (contractData) {
     // Pool 1 reserves (USDC-EURC)
     if (contractData[0]?.result) {
@@ -141,12 +192,20 @@ function useProtocolStats() {
     if (contractData[2]?.result) {
       tvl += Number(formatUnits(contractData[2].result as bigint, 6));
     }
+    // Bridge total volume (real on-chain data)
+    if (contractData[3]?.result) {
+      bridgeVolume = Number(formatUnits(contractData[3].result as bigint, 6));
+    }
   }
+
+  // Total volume = Real swap volume from events + Real bridge volume from contract
+  const totalVolume = swapVolume + bridgeVolume;
 
   return {
     tvl: Math.round(tvl),
     totalUsers,
     totalVolume: Math.round(totalVolume),
+    isLoadingVolume,
   };
 }
 
