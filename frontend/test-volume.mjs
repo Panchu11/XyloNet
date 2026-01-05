@@ -26,94 +26,116 @@ async function testVolumeQueries() {
     // Get current block
     const currentBlock = await client.getBlockNumber();
     console.log('📦 Current Block:', currentBlock.toString());
-    console.log('');
+    
+    const CHUNK_SIZE = 10000n;
+    const fromBlock = currentBlock - 100000n;
+    console.log('📊 Query Range: Block', fromBlock.toString(), 'to', currentBlock.toString());
+    console.log('   (Last ~100,000 blocks)\n');
 
-    // Test 1: Query USDC-EURC Pool Swap events
-    console.log('--- Test 1: USDC-EURC Pool Swaps ---');
+    // Test 1: Query USDC-EURC Pool Swap events IN CHUNKS
+    console.log('--- Test 1: USDC-EURC Pool Swaps (Chunked) ---');
     try {
-      const pool1Logs = await client.getLogs({
-        address: CONTRACTS.USDC_EURC_POOL,
-        event: SWAP_EVENT,
-        fromBlock: 0n,
-        toBlock: currentBlock,
-      });
-      
       let pool1Volume = 0;
-      pool1Logs.forEach((log) => {
-        const amountIn = log.args.amountIn;
-        if (amountIn) {
-          pool1Volume += Number(formatUnits(amountIn, 6));
-        }
-      });
+      let totalEvents = 0;
       
-      console.log(`✅ Found ${pool1Logs.length} swap events`);
-      console.log(`💰 Total Volume: $${pool1Volume.toLocaleString()}`);
-      if (pool1Logs.length > 0) {
-        console.log(`📝 Sample event:`, {
-          sender: pool1Logs[0].args.sender,
-          amountIn: formatUnits(pool1Logs[0].args.amountIn, 6),
-          amountOut: formatUnits(pool1Logs[0].args.amountOut, 6),
+      for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+        const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+        
+        const logs = await client.getLogs({
+          address: CONTRACTS.USDC_EURC_POOL,
+          event: SWAP_EVENT,
+          fromBlock: start,
+          toBlock: end,
         });
+        
+        logs.forEach((log) => {
+          const amountIn = log.args.amountIn;
+          if (amountIn) {
+            pool1Volume += Number(formatUnits(amountIn, 6));
+          }
+        });
+        totalEvents += logs.length;
       }
+      
+      console.log(`✅ Found ${totalEvents} swap events`);
+      console.log(`💰 Total Volume: $${pool1Volume.toLocaleString()}`);
     } catch (e) {
       console.log('❌ Error:', e.message);
     }
     console.log('');
 
-    // Test 2: Query USDC-USYC Pool Swap events
-    console.log('--- Test 2: USDC-USYC Pool Swaps ---');
+    // Test 2: Query USDC-USYC Pool Swap events IN CHUNKS
+    console.log('--- Test 2: USDC-USYC Pool Swaps (Chunked) ---');
     try {
-      const pool2Logs = await client.getLogs({
-        address: CONTRACTS.USDC_USYC_POOL,
-        event: SWAP_EVENT,
-        fromBlock: 0n,
-        toBlock: currentBlock,
-      });
-      
       let pool2Volume = 0;
-      pool2Logs.forEach((log) => {
-        const amountIn = log.args.amountIn;
-        if (amountIn) {
-          pool2Volume += Number(formatUnits(amountIn, 6));
-        }
-      });
+      let totalEvents = 0;
       
-      console.log(`✅ Found ${pool2Logs.length} swap events`);
+      for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+        const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+        
+        const logs = await client.getLogs({
+          address: CONTRACTS.USDC_USYC_POOL,
+          event: SWAP_EVENT,
+          fromBlock: start,
+          toBlock: end,
+        });
+        
+        logs.forEach((log) => {
+          const amountIn = log.args.amountIn;
+          if (amountIn) {
+            pool2Volume += Number(formatUnits(amountIn, 6));
+          }
+        });
+        totalEvents += logs.length;
+      }
+      
+      console.log(`✅ Found ${totalEvents} swap events`);
       console.log(`💰 Total Volume: $${pool2Volume.toLocaleString()}`);
     } catch (e) {
       console.log('❌ Error:', e.message);
     }
     console.log('');
 
-    // Test 3: Query Circle TokenMessenger Bridge events
-    console.log('--- Test 3: Circle CCTP Bridge (DepositForBurn) ---');
+    // Test 3: Query Circle TokenMessenger Bridge events IN CHUNKS
+    console.log('--- Test 3: Circle CCTP Bridge (DepositForBurn) IN CHUNKS ---');
     try {
-      const bridgeLogs = await client.getLogs({
-        address: CONTRACTS.TOKEN_MESSENGER,
-        event: DEPOSIT_FOR_BURN_EVENT,
-        fromBlock: 0n,
-        toBlock: currentBlock,
-      });
-      
       let bridgeVolume = 0;
-      bridgeLogs.forEach((log) => {
-        const amount = log.args.amount;
-        if (amount) {
-          bridgeVolume += Number(formatUnits(amount, 6));
-        }
-      });
+      let totalEvents = 0;
       
-      console.log(`✅ Found ${bridgeLogs.length} bridge events`);
-      console.log(`💰 Total Volume: $${bridgeVolume.toLocaleString()}`);
-      if (bridgeLogs.length > 0) {
-        console.log(`📝 Sample event:`, {
-          depositor: bridgeLogs[0].args.depositor,
-          amount: formatUnits(bridgeLogs[0].args.amount, 6),
-          destinationDomain: bridgeLogs[0].args.destinationDomain,
+      for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
+        const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
+        
+        const logs = await client.getLogs({
+          address: CONTRACTS.TOKEN_MESSENGER,
+          event: DEPOSIT_FOR_BURN_EVENT,
+          fromBlock: start,
+          toBlock: end,
         });
+        
+        logs.forEach((log) => {
+          const amount = log.args.amount;
+          if (amount) {
+            bridgeVolume += Number(formatUnits(amount, 6));
+          }
+        });
+        totalEvents += logs.length;
+        
+        if (logs.length > 0) {
+          console.log(`  Chunk ${start}-${end}: ${logs.length} events`);
+        }
+      }
+      
+      console.log(`✅ Found ${totalEvents} bridge events`);
+      console.log(`💰 Total Volume: $${bridgeVolume.toLocaleString()}`);
+      
+      if (totalEvents === 0) {
+        console.log('⚠️  No bridge events found in the last 100k blocks');
+        console.log('   This likely means no one has bridged FROM Arc yet.');
+        console.log('   Bridge events only show OUTGOING bridges (Arc → Other chains)');
       }
     } catch (e) {
       console.log('❌ Error:', e.message);
+      console.log('   Full error:', e);
     }
     console.log('');
 
@@ -143,6 +165,15 @@ async function testVolumeQueries() {
     } catch (e) {
       console.log('❌ Error:', e.message);
     }
+    console.log('');
+    
+    console.log('='.repeat(60));
+    console.log('SUMMARY:');
+    console.log('If swap volume shows but bridge = $0, it means:');
+    console.log('1. No one has bridged FROM Arc in the last 100k blocks');
+    console.log('2. DepositForBurn only tracks OUTGOING bridges');
+    console.log('3. Users might be bridging TO Arc (not tracked by this event)');
+    console.log('='.repeat(60));
 
   } catch (error) {
     console.error('Fatal Error:', error);

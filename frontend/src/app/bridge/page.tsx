@@ -291,12 +291,12 @@ export default function BridgePage() {
         {/* Live Bridge Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
           <StatPill 
-            label="Total Volume" 
-            value={totalVolume > 0 ? `$${formatNumber(totalVolume)}` : (isLoadingStats ? 'Loading...' : '$0')} 
+            label="Outgoing Volume" 
+            value={totalVolume > 0 ? `$${formatNumber(totalVolume)}` : (isLoadingStats ? 'Loading...' : 'No data')} 
             icon={<TrendingUp className="w-4 h-4" />} 
           />
           <StatPill 
-            label="Total Bridges" 
+            label="Outgoing Bridges" 
             value={totalBridges > 0 ? formatNumber(totalBridges) : (isLoadingStats ? '...' : '0')} 
             icon={<Activity className="w-4 h-4" />} 
           />
