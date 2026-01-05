@@ -1,133 +1,44 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useReadContract, usePublicClient } from 'wagmi'
-import { formatUnits, parseAbiItem } from 'viem'
+import { useAccount } from 'wagmi'
 import { BridgeWidget } from '@/components/bridge/BridgeWidget'
 import { TiltCard } from '@/components/ui/TiltCard'
 import { Lock, Zap, Globe, ArrowRight, Network, Timer, CheckCircle2, Sparkles, TrendingUp, Activity } from 'lucide-react'
-import { CONTRACTS, ARC_NETWORK } from '@/config/constants'
 import { loadTransactions } from '@/lib/transactions'
 import { formatNumber } from '@/lib/utils'
-
-// Circle TokenMessenger DepositForBurn event for tracking real bridge volume
-const DEPOSIT_FOR_BURN_EVENT = parseAbiItem('event DepositForBurn(uint64 indexed nonce, address indexed burnToken, uint256 amount, address indexed depositor, bytes32 mintRecipient, uint32 destinationDomain, bytes32 destinationTokenMessenger, bytes32 destinationCaller)')
-
-// Bridge ABI for stats (backup)
-const BRIDGE_ABI = [
-  {
-    inputs: [],
-    name: 'getStats',
-    outputs: [
-      { name: '_totalBridgedIn', type: 'uint256' },
-      { name: '_totalBridgedOut', type: 'uint256' },
-      { name: '_bridgeCount', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const
 
 export default function BridgePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
   const [activeChain, setActiveChain] = useState(0)
-  const publicClient = usePublicClient({ chainId: ARC_NETWORK.chainId })
+  const { address } = useAccount()
 
-  // State for real bridge stats from Circle's contract events
-  const [realBridgeVolume, setRealBridgeVolume] = useState(0)
-  const [realBridgeCount, setRealBridgeCount] = useState(0)
-  const [isLoadingStats, setIsLoadingStats] = useState(true)
-
-  // Read bridge stats from our contract (backup)
-  const { data: bridgeStats } = useReadContract({
-    address: CONTRACTS.BRIDGE,
-    abi: BRIDGE_ABI,
-    functionName: 'getStats',
-  })
-
-  // Fetch REAL bridge data from Circle's TokenMessenger events (in chunks)
-  useEffect(() => {
-    async function fetchBridgeVolume() {
-      if (!publicClient) return;
-      
-      try {
-        setIsLoadingStats(true);
-        let totalVolume = 0;
-        let totalCount = 0;
-        
-        // Get current block
-        const currentBlock = await publicClient.getBlockNumber();
-        const CHUNK_SIZE = 10000n;
-        const fromBlock = currentBlock - 100000n; // Last ~100k blocks
-        
-        console.log('Querying bridge events from block:', fromBlock.toString(), 'to', currentBlock.toString());
-        
-        // Query DepositForBurn events in chunks
-        try {
-          for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
-            const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
-            
-            const logs = await publicClient.getLogs({
-              address: CONTRACTS.TOKEN_MESSENGER,
-              event: DEPOSIT_FOR_BURN_EVENT,
-              fromBlock: start,
-              toBlock: end,
-            });
-            
-            logs.forEach((log) => {
-              const amount = log.args.amount as bigint;
-              if (amount) {
-                totalVolume += Number(formatUnits(amount, 6));
-                totalCount++;
-              }
-            });
-          }
-          
-          console.log('Circle bridge events:', totalCount, 'Volume:', totalVolume);
-        } catch (e) {
-          console.error('Failed to fetch Circle bridge logs:', e);
-        }
-        
-        setRealBridgeVolume(totalVolume);
-        setRealBridgeCount(totalCount);
-      } catch (e) {
-        console.error('Failed to fetch bridge stats:', e);
-      } finally {
-        setIsLoadingStats(false);
-      }
-    }
-    
-    fetchBridgeVolume();
-  }, [publicClient]);
-
-  // Fallback to our contract stats if Circle query fails
-  const contractBridgedIn = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[0], 6)) : 0
-  const contractBridgedOut = bridgeStats ? Number(formatUnits((bridgeStats as [bigint, bigint, bigint])[1], 6)) : 0
-  const contractBridgeCount = bridgeStats ? Number((bridgeStats as [bigint, bigint, bigint])[2]) : 0
-  
-  // Get bridge transactions from local history for additional stats
+  // Personal bridge stats from localStorage
+  const [personalBridges, setPersonalBridges] = useState(0)
+  const [personalVolume, setPersonalVolume] = useState(0)
   const [avgBridgeTime, setAvgBridgeTime] = useState(0)
-  const [successfulBridges, setSuccessfulBridges] = useState(0)
-  const [totalBridgeAttempts, setTotalBridgeAttempts] = useState(0)
+  const [successRate, setSuccessRate] = useState(0)
   
   useEffect(() => {
     const txs = loadTransactions()
     const bridgeTxs = txs.filter(tx => tx.type === 'bridge')
     const successBridges = bridgeTxs.filter(tx => tx.status === 'success')
     
-    setTotalBridgeAttempts(bridgeTxs.length)
-    setSuccessfulBridges(successBridges.length)
+    // Calculate personal volume
+    let volume = 0
+    successBridges.forEach(tx => {
+      if (tx.amountIn) volume += parseFloat(tx.amountIn) || 0
+    })
     
-    // Average time is ~28s for CCTP attestation
+    setPersonalBridges(successBridges.length)
+    setPersonalVolume(volume)
     setAvgBridgeTime(successBridges.length > 0 ? 28 : 0)
+    
+    const rate = bridgeTxs.length > 0 
+      ? Math.round((successBridges.length / bridgeTxs.length) * 1000) / 10
+      : 0
+    setSuccessRate(rate)
   }, [])
-  
-  // Use real Circle data, fall back to contract data
-  const totalVolume = realBridgeVolume > 0 ? realBridgeVolume : (contractBridgedIn + contractBridgedOut)
-  const totalBridges = realBridgeCount > 0 ? realBridgeCount : contractBridgeCount
-  const successRate = totalBridgeAttempts > 0 
-    ? Math.round((successfulBridges / totalBridgeAttempts) * 1000) / 10
-    : (totalBridges > 0 ? 99.8 : 0)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -288,28 +199,41 @@ export default function BridgePage() {
           />
         </div>
 
-        {/* Live Bridge Stats */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
-          <StatPill 
-            label="Outgoing Volume" 
-            value={totalVolume > 0 ? `$${formatNumber(totalVolume)}` : (isLoadingStats ? 'Loading...' : 'No data')} 
-            icon={<TrendingUp className="w-4 h-4" />} 
-          />
-          <StatPill 
-            label="Outgoing Bridges" 
-            value={totalBridges > 0 ? formatNumber(totalBridges) : (isLoadingStats ? '...' : '0')} 
-            icon={<Activity className="w-4 h-4" />} 
-          />
-          <StatPill 
-            label="Avg. Time" 
-            value={avgBridgeTime > 0 ? `${avgBridgeTime}s` : '--'} 
-            icon={<Timer className="w-4 h-4" />} 
-          />
-          <StatPill 
-            label="Success Rate" 
-            value={successRate > 0 ? `${successRate.toFixed(1)}%` : '--'} 
-            icon={<CheckCircle2 className="w-4 h-4" />} 
-          />
+        {/* Personal Bridge Stats */}
+        <div className="mt-12 max-w-3xl w-full">
+          {address ? (
+            <>
+              <div className="text-center mb-4">
+                <h3 className="text-lg text-gray-400 font-medium">Your Bridge Activity</h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatPill 
+                  label="Your Bridges" 
+                  value={personalBridges > 0 ? formatNumber(personalBridges) : '0'} 
+                  icon={<Activity className="w-4 h-4" />} 
+                />
+                <StatPill 
+                  label="Your Volume" 
+                  value={personalVolume > 0 ? `$${formatNumber(personalVolume)}` : '$0'} 
+                  icon={<TrendingUp className="w-4 h-4" />} 
+                />
+                <StatPill 
+                  label="Avg. Time" 
+                  value={avgBridgeTime > 0 ? `${avgBridgeTime}s` : '--'} 
+                  icon={<Timer className="w-4 h-4" />} 
+                />
+                <StatPill 
+                  label="Success Rate" 
+                  value={successRate > 0 ? `${successRate.toFixed(1)}%` : '--'} 
+                  icon={<CheckCircle2 className="w-4 h-4" />} 
+                />
+              </div>
+            </>
+          ) : (
+            <div className="glass-premium rounded-xl p-6 text-center">
+              <p className="text-gray-400">Connect your wallet to see your bridge statistics</p>
+            </div>
+          )}
         </div>
       </section>
     </div>
