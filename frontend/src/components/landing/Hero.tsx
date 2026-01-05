@@ -6,6 +6,7 @@ import { useReadContracts } from 'wagmi';
 import { CONTRACTS } from '@/config/constants';
 import { XYLO_POOL_ABI, XYLO_VAULT_ABI } from '@/config/abis';
 import { formatUnits } from 'viem';
+import { loadTransactions } from '@/lib/transactions';
 
 // Animated number counter with formatting
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: number; suffix?: string; prefix?: string }) {
@@ -70,6 +71,7 @@ function FloatingParticle({ delay, size, left, duration }: { delay: number; size
 // Hook to fetch real protocol stats
 function useProtocolStats() {
   const [totalUsers, setTotalUsers] = useState(0);
+  const [totalVolume, setTotalVolume] = useState(0);
 
   // Fetch on-chain data from pools and vault
   const { data: contractData } = useReadContracts({
@@ -95,7 +97,7 @@ function useProtocolStats() {
     ],
   });
 
-  // Fetch user count from Supabase
+  // Fetch user count from Supabase and calculate volume from transactions
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -107,6 +109,19 @@ function useProtocolStats() {
       }
     }
     fetchUsers();
+    
+    // Calculate total volume from transaction history
+    try {
+      const txs = loadTransactions();
+      let volume = 0;
+      txs.forEach(tx => {
+        if (tx.amountIn) volume += parseFloat(tx.amountIn) || 0;
+        if (tx.amountOut) volume += parseFloat(tx.amountOut) || 0;
+      });
+      setTotalVolume(volume);
+    } catch (e) {
+      console.error('Failed to calculate volume:', e);
+    }
   }, []);
 
   // Calculate TVL from contract data
@@ -131,13 +146,14 @@ function useProtocolStats() {
   return {
     tvl: Math.round(tvl),
     totalUsers,
+    totalVolume: Math.round(totalVolume),
   };
 }
 
 export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
-  const { tvl, totalUsers } = useProtocolStats();
+  const { tvl, totalUsers, totalVolume } = useProtocolStats();
 
   useEffect(() => {
     setIsVisible(true);
@@ -305,7 +321,7 @@ export default function Hero() {
         <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {[
             { label: 'Total Value Locked', value: tvl, prefix: '$', suffix: '', isLive: true },
-            { label: 'Supported Chains', value: 7, prefix: '', suffix: '+', isLive: false },
+            { label: 'Total Volume', value: totalVolume, prefix: '$', suffix: '', isLive: true },
             { label: 'Unique Users', value: totalUsers, prefix: '', suffix: '', isLive: true },
             { label: 'Avg. Gas Cost', value: 0.01, prefix: '~$', suffix: '', isLive: false },
           ].map((stat) => (

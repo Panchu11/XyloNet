@@ -321,7 +321,7 @@ function StatCard({ icon, label, value, change, gradient, isLive }: { icon: Reac
             <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
           )}
         </div>
-        <div className="text-xl md:text-2xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent mb-1">
+        <div className={`text-xl md:text-2xl font-bold text-white mb-1`}>
           {value}
         </div>
         <div className="text-[10px] text-gray-500">{change}</div>
@@ -344,7 +344,7 @@ function FeatureCard({ title, description, icon, gradient, stats }: { title: str
           {stats.map((stat, i) => (
             <div key={i}>
               <div className="text-[10px] text-gray-500 mb-1">{stat.label}</div>
-              <div className={`text-lg font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
+              <div className="text-lg font-bold text-white">
                 {stat.value}
               </div>
             </div>
