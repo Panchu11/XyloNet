@@ -135,13 +135,19 @@ function useProtocolStats() {
         
         // Arc RPC limits eth_getLogs to 10,000 blocks per query
         const CHUNK_SIZE = 10000n;
-        const fromBlock = currentBlock - 100000n; // Last ~100k blocks (~30 days at 3s/block)
         
-        console.log('Querying from block:', fromBlock.toString(), 'to', currentBlock.toString());
+        // Query from contract deployment (~block 19,900,000) to get ALL historical data
+        // This ensures we capture all swaps since launch, not just recent ones
+        const DEPLOYMENT_BLOCK = 19900000n;
+        const fromBlock = DEPLOYMENT_BLOCK;
+        
+        console.log('Querying ALL swap history from block:', fromBlock.toString(), 'to', currentBlock.toString());
+        console.log('Total blocks to scan:', (currentBlock - fromBlock).toString());
         
         // Query USDC-EURC pool in chunks
         try {
           let pool1Volume = 0;
+          let pool1Events = 0;
           for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
             const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
             
@@ -158,9 +164,10 @@ function useProtocolStats() {
                 pool1Volume += Number(formatUnits(amountIn, 6));
               }
             });
+            pool1Events += logs.length;
           }
           totalSwapVolume += pool1Volume;
-          console.log('Pool 1 swap volume:', pool1Volume);
+          console.log('Pool 1 swap volume:', pool1Volume, 'from', pool1Events, 'swaps');
         } catch (e) {
           console.error('Failed to fetch pool 1 logs:', e);
         }
@@ -168,6 +175,7 @@ function useProtocolStats() {
         // Query USDC-USYC pool in chunks
         try {
           let pool2Volume = 0;
+          let pool2Events = 0;
           for (let start = fromBlock; start < currentBlock; start += CHUNK_SIZE) {
             const end = start + CHUNK_SIZE > currentBlock ? currentBlock : start + CHUNK_SIZE;
             
@@ -184,15 +192,16 @@ function useProtocolStats() {
                 pool2Volume += Number(formatUnits(amountIn, 6));
               }
             });
+            pool2Events += logs.length;
           }
           totalSwapVolume += pool2Volume;
-          console.log('Pool 2 swap volume:', pool2Volume);
+          console.log('Pool 2 swap volume:', pool2Volume, 'from', pool2Events, 'swaps');
         } catch (e) {
           console.error('Failed to fetch pool 2 logs:', e);
         }
         
         setSwapVolume(totalSwapVolume);
-        console.log('Total swap volume:', totalSwapVolume);
+        console.log('Total swap volume (ALL TIME):', totalSwapVolume);
       } catch (e) {
         console.error('Failed to fetch swap volume:', e);
       } finally {

@@ -28,9 +28,10 @@ async function testVolumeQueries() {
     console.log('📦 Current Block:', currentBlock.toString());
     
     const CHUNK_SIZE = 10000n;
-    const fromBlock = currentBlock - 100000n;
+    const DEPLOYMENT_BLOCK = 19900000n; // Contract deployment block
+    const fromBlock = DEPLOYMENT_BLOCK;
     console.log('📊 Query Range: Block', fromBlock.toString(), 'to', currentBlock.toString());
-    console.log('   (Last ~100,000 blocks)\n');
+    console.log('   (ALL TIME - since contract deployment)\n');
 
     // Test 1: Query USDC-EURC Pool Swap events IN CHUNKS
     console.log('--- Test 1: USDC-EURC Pool Swaps (Chunked) ---');
