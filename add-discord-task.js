@@ -71,7 +71,7 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Task 4: Join Discord (NEW!)
 INSERT INTO tasks (name, description, task_type, action_url, points, is_active)
-VALUES ('join_discord', 'Join XyloNet Discord Community', 'social', 'https://discord.gg/4aXEm78a', 50, true)
+VALUES ('join_discord', 'Join XyloNet Discord Community', 'social', 'https://discord.gg/qVbd6TbcTA', 50, true)
 ON CONFLICT (name) DO NOTHING;
 
 -- =====================================================
