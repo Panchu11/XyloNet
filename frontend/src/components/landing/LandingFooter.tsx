@@ -80,7 +80,7 @@ export default function LandingFooter() {
                 </div>
                 
                 <a
-                  href="https://discord.gg/qVbd6TbcTA"
+                  href="https://discord.gg/mcDkHNrFyA"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group relative w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all duration-300"
