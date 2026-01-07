@@ -75,7 +75,7 @@ export function Footer() {
 
             {/* Discord */}
             <a
-              href="https://discord.gg/suuzwn8b44"
+              href="https://discord.gg/4aXEm78a"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[var(--card-bg)] border border-[var(--border)] hover:border-[#5865F2] hover:bg-[#5865F2]/10 transition-all duration-200 group min-h-[40px]"
