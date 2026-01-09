@@ -127,6 +127,27 @@ body {
   }
 }
 
+/* Floating particle (for PayX showcase) */
+@keyframes float-particle {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(var(--tx, 100px), var(--ty, -100px)) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-float-particle {
+  animation: float-particle linear infinite;
+  --tx: calc(Math.random() * 200px - 100px);
+  --ty: calc(Math.random() * -200px - 100px);
+}
+
 /* Scroll indicator */
 @keyframes scroll-down {
   0% { 

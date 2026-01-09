@@ -9,9 +9,10 @@ const footerLinks = {
     { name: 'Bridge', href: '/bridge', description: 'Cross-chain transfers' },
     { name: 'Pools', href: '/pools', description: 'Provide liquidity' },
     { name: 'Vault', href: '/vault', description: 'Earn yield' },
+    { name: 'PayX', href: '/payx', description: 'Tip on X/Twitter', featured: true },
   ],
   resources: [
-    { name: 'Documentation', href: '#', disabled: true },
+    { name: 'Documentation', href: '/docs', disabled: false },
     { name: 'GitHub', href: '#', disabled: true },
     { name: 'Arc Network', href: 'https://www.arc.network/', external: true },
     { name: 'Circle CCTP', href: 'https://www.circle.com/en/cross-chain-transfer-protocol', external: true },
@@ -101,14 +102,23 @@ export default function LandingFooter() {
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200"
+                      className={`group flex items-center gap-2 transition-colors duration-200 ${
+                        link.featured 
+                          ? 'text-indigo-400 hover:text-indigo-300' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
                       onMouseEnter={() => setHoveredLink(link.name)}
                       onMouseLeave={() => setHoveredLink(null)}
                     >
                       <span className={`w-1 h-1 rounded-full transition-all duration-200 ${
-                        hoveredLink === link.name ? 'bg-cyan-400 scale-150' : 'bg-gray-600'
+                        link.featured
+                          ? 'bg-indigo-400'
+                          : hoveredLink === link.name ? 'bg-cyan-400 scale-150' : 'bg-gray-600'
                       }`} />
                       <span className="text-sm">{link.name}</span>
+                      {link.featured && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-indigo-500/20 border border-indigo-500/30 rounded text-indigo-400 font-medium">NEW</span>
+                      )}
                     </Link>
                   </li>
                 ))}
@@ -127,7 +137,7 @@ export default function LandingFooter() {
                         {link.name}
                         <span className="text-[10px] px-1.5 py-0.5 bg-white/5 rounded text-gray-600">Soon</span>
                       </span>
-                    ) : (
+                    ) : link.external ? (
                       <a
                         href={link.href}
                         target="_blank"
@@ -144,6 +154,18 @@ export default function LandingFooter() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
                       </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="group flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200"
+                        onMouseEnter={() => setHoveredLink(link.name)}
+                        onMouseLeave={() => setHoveredLink(null)}
+                      >
+                        <span className={`w-1 h-1 rounded-full transition-all duration-200 ${
+                          hoveredLink === link.name ? 'bg-cyan-400 scale-150' : 'bg-gray-600'
+                        }`} />
+                        <span className="text-sm">{link.name}</span>
+                      </Link>
                     )}
                   </li>
                 ))}

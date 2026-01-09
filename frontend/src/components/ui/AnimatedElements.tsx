@@ -293,7 +293,7 @@ export function GlowButton({
       <span
         className="absolute inset-0 rounded-xl"
         style={{
-          background: `linear-gradient(90deg, ${glowColor}, transparent, ${glowColor})`,
+          backgroundImage: `linear-gradient(90deg, ${glowColor}, transparent, ${glowColor})`,
           backgroundSize: '200% 100%',
           animation: isHovered ? 'shimmer 1.5s infinite' : 'none',
           opacity: 0.5,

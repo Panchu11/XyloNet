@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { AnimatedBackground } from "@/components/ui/AnimatedBackground";
+import { AnimatedBackgroundWrapper } from "@/components/ui/AnimatedBackgroundWrapper";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import ConditionalFooter from "@/components/ConditionalFooter";
 
@@ -56,7 +56,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.variable} font-sans antialiased bg-[var(--background)] text-[var(--text-primary)] min-h-screen flex flex-col`}>
         <Providers>
-          <AnimatedBackground />
+          <AnimatedBackgroundWrapper />
           <CommandPalette />
           <Header />
           <main className="flex-1">

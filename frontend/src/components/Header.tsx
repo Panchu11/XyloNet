@@ -10,11 +10,12 @@ import { useAccount } from 'wagmi'
 import { cn } from '@/lib/utils'
 import { XyloNetLogoFallback } from './ui/TokenLogos'
 
-const navLinks = [
+const navLinks: Array<{ href: string; label: string; highlight?: boolean }> = [
   { href: '/swap', label: 'Swap' },
   { href: '/pools', label: 'Pools' },
   { href: '/bridge', label: 'Bridge' },
   { href: '/vault', label: 'Vault' },
+  { href: '/payx', label: 'PayX', highlight: true },
   { href: '/history', label: 'History' },
 ]
 
@@ -22,6 +23,11 @@ export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { isConnected } = useAccount()
+
+  // Don't render global header on PayX pages - they have their own navigation
+  if (pathname?.startsWith('/payx')) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[var(--card-border)] bg-[var(--background)]/95 backdrop-blur-sm">
@@ -67,12 +73,19 @@ export function Header() {
               href={link.href}
               className={cn(
                 'px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
-                pathname === link.href
+                pathname === link.href || (link.href === '/payx' && pathname?.startsWith('/payx'))
                   ? 'bg-[var(--primary)] text-white'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+                link.highlight && 'relative'
               )}
             >
               {link.label}
+              {link.highlight && (
+                <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -118,13 +131,19 @@ export function Header() {
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all min-h-[48px]',
-                  pathname === link.href
+                  'flex items-center px-4 py-3 rounded-lg text-base font-medium transition-all min-h-[48px] relative',
+                  pathname === link.href || (link.href === '/payx' && pathname?.startsWith('/payx'))
                     ? 'bg-[var(--primary)] text-white'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card-border)] active:bg-[var(--card-border)]'
                 )}
               >
                 {link.label}
+                {link.highlight && (
+                  <span className="ml-2 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                )}
               </Link>
             ))}
             {/* Network status on mobile */}

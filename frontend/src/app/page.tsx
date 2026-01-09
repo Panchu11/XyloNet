@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Hero, Features } from '@/components/landing';
+import { Hero, Features, PayXShowcase } from '@/components/landing';
 import { AnimatedBackground } from '@/components/ui/AnimatedBackground';
 
 // Performance: Lazy load below-the-fold components
@@ -30,6 +30,7 @@ export default function LandingPage() {
       <main className="relative z-10">
         <Hero />
         <Features />
+        <PayXShowcase />
         <Campaign />
         <SupportedAssets />
         <PoweredByArc />

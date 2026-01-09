@@ -82,7 +82,7 @@ export function TiltCard({
           <div
             className="absolute inset-0 transition-opacity duration-300"
             style={{
-              background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
+              backgroundImage: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.15) 0%, transparent 60%)`,
               opacity: isHovered ? 1 : 0,
             }}
           />
@@ -98,7 +98,7 @@ export function TiltCard({
           <div
             className="absolute inset-0 opacity-20"
             style={{
-              background: `linear-gradient(
+              backgroundImage: `linear-gradient(
                 ${105 + (glarePosition.x - 50) * 0.5}deg,
                 transparent 0%,
                 rgba(122, 110, 239, 0.3) 25%,
@@ -214,7 +214,7 @@ export function GlassCard({
         className
       )}
       style={{
-        background: `rgba(26, 26, 58, ${opacity})`,
+        backgroundColor: `rgba(26, 26, 58, ${opacity})`,
         backdropFilter: `blur(${blur}px)`,
         WebkitBackdropFilter: `blur(${blur}px)`,
       }}
