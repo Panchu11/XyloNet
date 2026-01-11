@@ -3,7 +3,7 @@
   "name": "PayX - Tip on X",
   "version": "2.0.0",
   "description": "Tip anyone on X with USDC instantly. Premium design by ForgeLabs.",
-  "homepage_url": "https://payx.xylonet.xyz",
+  "homepage_url": "https://xylonet.xyz/payx",
   "permissions": [
     "storage",
     "activeTab",
