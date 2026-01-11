@@ -50,12 +50,12 @@ export function SwapWidget({ className }: SwapWidgetProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   // Get token balances
-  const { data: balanceIn } = useBalance({
+  const { data: balanceIn, refetch: refetchBalanceIn } = useBalance({
     address,
     token: TOKENS[tokenIn].address,
   })
 
-  const { data: balanceOut } = useBalance({
+  const { data: balanceOut, refetch: refetchBalanceOut } = useBalance({
     address,
     token: TOKENS[tokenOut].address,
   })
@@ -129,12 +129,15 @@ export function SwapWidget({ className }: SwapWidgetProps) {
         amountOut: amountOut,
         status: 'success',
       })
+      // Refetch balances to show updated amounts
+      refetchBalanceIn()
+      refetchBalanceOut()
       // Reset input fields
       setAmountIn('')
       setAmountOut('')
       setErrorMsg(null)
     }
-  }, [isSwapConfirmed, swapHash, lastProcessedSwapHash, success, tokenIn, tokenOut, amountIn, amountOut])
+  }, [isSwapConfirmed, swapHash, lastProcessedSwapHash, success, tokenIn, tokenOut, amountIn, amountOut, refetchBalanceIn, refetchBalanceOut])
 
   // Handle errors
   useEffect(() => {
