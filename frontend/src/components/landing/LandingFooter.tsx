@@ -9,7 +9,8 @@ const footerLinks = {
     { name: 'Bridge', href: '/bridge', description: 'Cross-chain transfers' },
     { name: 'Pools', href: '/pools', description: 'Provide liquidity' },
     { name: 'Vault', href: '/vault', description: 'Earn yield' },
-    { name: 'PayX', href: '/payx', description: 'Tip on X/Twitter', featured: true },
+    { name: 'Faucet', href: '/faucet', description: 'Get testnet USDC', featured: true },
+    { name: 'PayX', href: '/payx', description: 'Tip on X/Twitter' },
   ],
   resources: [
     { name: 'Documentation', href: '/docs', disabled: false },

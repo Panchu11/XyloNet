@@ -15,7 +15,8 @@ const navLinks: Array<{ href: string; label: string; highlight?: boolean }> = [
   { href: '/pools', label: 'Pools' },
   { href: '/bridge', label: 'Bridge' },
   { href: '/vault', label: 'Vault' },
-  { href: '/payx', label: 'PayX', highlight: true },
+  { href: '/faucet', label: 'Faucet', highlight: true },
+  { href: '/payx', label: 'PayX' },
   { href: '/history', label: 'History' },
 ]
 
